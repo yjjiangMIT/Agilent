@@ -1,0 +1,12 @@
+Sequence:
+*CLS #10
+SYST:REM #10
+FUNC "VOLT:DC" #10
+SAMP:COUN 10 #10
+TRIG:SOUR IMM #10
+TRIG:DELAY 0 #10
+INIT #5000
+FETC? #10
+
+Description:
+Ten consequtive measurements of DC voltage after immediate trigger, measurements separated by 1 ms delay.
