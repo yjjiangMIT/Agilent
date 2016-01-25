@@ -1,26 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 using System.IO.Ports;
+using System.Drawing;
 
 namespace Agilent
 {
     class Command
     {
-        public Command(string line, int delay)
+        public Command(string scpi, int delay)
         {
-            this.line = line;
+            this.scpi = scpi;
             this.delay = delay;
         }
 
-        private string line;
+        private string scpi;
         private int delay;
 
-        public string Line
+        public string Scpi
         {
             get
             {
-                return this.line;
+                return this.scpi;
             }
         }
         public int Delay
@@ -36,16 +38,25 @@ namespace Agilent
     {
         private List<Command> commands;
         private string description;
-        private int counter;
-        private int total;
+        private int length;
 
-        public Sequence(StreamReader reader)
+        public Sequence()
         {
             this.commands = new List<Command>();
             this.description = "";
-            this.LoadSequence(reader);
+            this.length = 0;
         }
 
+        // Number of commands in the sequence
+        public int Length
+        {
+            get
+            {
+                return this.length;
+            }
+        }
+
+        // Load a sequence from a file
         public void LoadSequence(StreamReader reader)
         {
             string line;
@@ -61,7 +72,7 @@ namespace Agilent
                 string[] splitLine = line.Split('#');
                 this.commands.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
             }
-            this.total = this.commands.Count;
+            this.length = this.commands.Count;
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("Description:"))
@@ -73,31 +84,71 @@ namespace Agilent
             {
                 this.description = line;
             }
-            this.counter = 0;
         }
 
+        // Display a sequence to Form
+        public void DisplaySequence(RichTextBox tbxCommand, RichTextBox tbxDelay, RichTextBox tbxDescription, int currentIndex = -1)
+        {
+            tbxCommand.Clear();
+            tbxDelay.Clear();
+            if (length > 0)
+            {
+                for (int i = 0; i < this.length; i++)
+                {
+                    if (i == currentIndex)
+                    {
+                        tbxCommand.SelectionBackColor = Color.Yellow;
+                        tbxDelay.SelectionBackColor = Color.Yellow;
+                    }
+                    else
+                    {
+                        tbxCommand.SelectionBackColor = Color.White;
+                        tbxCommand.SelectionBackColor = Color.White;
+                    }
+                    tbxCommand.AppendText(this.commands[i].Scpi + "\r\n");
+                    tbxDelay.AppendText(this.commands[i].Delay + "\r\n");
+                }
+            }
+            tbxDescription.Text = this.description;
+        }
+
+        // Load a sequence from Form
+        public void UpdateSequence(RichTextBox tbxCommand, RichTextBox tbxDelay, RichTextBox tbxDescription)
+        {
+            this.commands.Clear();
+            for (int i = tbxCommand.Lines.Length - 1; i >= 0; i--)
+            {
+                if (tbxCommand.Lines[i].Length > 0)
+                {
+                    this.length = i + 1;
+                    break;
+                }
+            }
+            this.description = tbxDescription.Text;
+            for (int i = 0; i < this.length; i++)
+            {
+                this.commands.Add(new Command(tbxCommand.Lines[i], int.Parse(tbxDelay.Lines[i])));
+            }
+            Console.WriteLine(this.description);
+        }
+
+        // Get the description of a sequence
         public override string ToString()
         {
             return this.description;
         }
 
-        public Command NextCommand()
+        // Get a command with given index
+        public Command getCommand(int index)
         {
-            if (this.counter < this.total)
+            if (index < this.length)
             {
-                Command nextCommand = this.commands[this.counter];
-                this.counter += 1;
-                return nextCommand;
+                return this.commands[index];
             }
             else
             {
                 return null;
             }
-        }
-
-        public void ResetCounter()
-        {
-            this.counter = 0;
         }
     }
 }

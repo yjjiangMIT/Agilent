@@ -7,6 +7,15 @@ c:\users\bec3\documents\visual studio 2010\Projects\Agilent\Agilent\obj\x86\Debu
 c:\users\bec3\documents\visual studio 2010\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.exe
 c:\users\bec3\documents\visual studio 2010\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.pdb
 C:\Users\bec3\Documents\Visual Studio 2010\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.csprojResolveAssemblyReference.cache
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.exe
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.pdb
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.csprojResolveAssemblyReference.cache
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.Form1.resources
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.Form2.resources
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.Properties.Resources.resources
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\obj\x86\Debug\Agilent.csproj.GenerateResource.Cache
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\bin\Debug\Agilent.exe
+C:\Users\Yijun\Desktop\Agilent\Agilent\Agilent\bin\Debug\Agilent.pdb
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.exe
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.pdb
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\bin\Debug\Agilent.exe

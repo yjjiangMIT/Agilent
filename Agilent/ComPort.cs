@@ -14,7 +14,7 @@ namespace Agilent
             this.BaudRate = baudRate;
             this.DataBits = dataBits;
             this.DtrEnable = true;
-            this.ReadTimeout = 1000000;
+
             switch (stopBits)
             {
                 case 0: this.StopBits = StopBits.None; break;
@@ -33,6 +33,14 @@ namespace Agilent
             : base()
         {
 
+        }
+
+        public int readtimeout
+        {
+            set
+            {
+                this.ReadTimeout = value;
+            }
         }
     }
 }
