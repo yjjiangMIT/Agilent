@@ -1,0 +1,10 @@
+Sequence:
+*CLS #10
+SYST:REM #10
+FUNC "VOLT:AC" #10
+SAMP:COUN 1 #10
+TRIG:SOUR IMM #10
+READ? #10
+
+Description:
+One measurements of DC voltage after external trigger.

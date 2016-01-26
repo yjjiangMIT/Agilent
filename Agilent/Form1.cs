@@ -333,7 +333,7 @@ namespace Agilent
                     {
                         using (writer = new StreamWriter(stream))
                         {
-                            WriteToFile(writer);
+                            WriteReadoutToFile(writer);
                         }
                     }
                 }
@@ -344,7 +344,7 @@ namespace Agilent
             }
         }
 
-        private void WriteToFile(StreamWriter writer)
+        private void WriteReadoutToFile(StreamWriter writer)
         {
             string[] readout = this.richTextBoxReadout.Text.Split('\n');
             string[] resolution = this.richTextBoxResolution.Text.Split('\n');
@@ -355,13 +355,11 @@ namespace Agilent
             writer.WriteLine("Description," + this.sequence.ToString());
             writer.Write(Environment.NewLine);
             writer.WriteLine("Readout,Resolution");
-            writer.Write(Environment.NewLine);
             for (int i = 0; i < length; i++)
             {
                 writer.Write(readout[i]);
                 writer.Write(",");
-                writer.Write(resolution[i]);
-                writer.Write(Environment.NewLine);
+                writer.WriteLine(resolution[i]);
             }
             writer.Close();
         }
@@ -410,6 +408,53 @@ namespace Agilent
             {
                 // Do nothing.
             }
+        }
+
+        private void buttonSaveSequence_Click(object sender, EventArgs e)
+        {
+            Stream stream = null;
+            StreamWriter writer = null;
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+
+            saveFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"sequences";
+            saveFileDialog1.Filter = "txt files(*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog1.FilterIndex = 1;
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.FileName = this.sequence.FileName;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if ((stream = saveFileDialog1.OpenFile()) != null)
+                    {
+                        using (writer = new StreamWriter(stream))
+                        {
+                            WriteSequenceToFile(writer);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        private void WriteSequenceToFile(StreamWriter writer)
+        {
+            this.sequence.UpdateSequence(richTextBoxCommand, richTextBoxDelay, richTextBoxDescription);
+            writer.WriteLine("Sequence:");
+            for (int i = 0; i < this.sequence.Length; i++)
+            {
+                writer.Write(this.sequence.getCommand(i).Scpi);
+                writer.Write(" #");
+                writer.WriteLine(this.sequence.getCommand(i).Delay);
+                Console.WriteLine(this.sequence.getCommand(i).Delay);
+            }
+            writer.Write(Environment.NewLine);
+            writer.WriteLine("Description:");
+            writer.WriteLine(this.sequence.ToString());
         }
     }
 }

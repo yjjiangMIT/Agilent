@@ -139,23 +139,22 @@ namespace Agilent
         }
 
         // Load a sequence from Form
-        public void UpdateSequence(RichTextBox tbxCommand, RichTextBox tbxDelay, RichTextBox tbxDescription)
+        public void UpdateSequence(RichTextBox richTextBoxCommand, RichTextBox richTextBoxDelay, RichTextBox richTextBoxDescription)
         {
             this.commands.Clear();
-            for (int i = tbxCommand.Lines.Length - 1; i >= 0; i--)
+            for (int i = richTextBoxCommand.Lines.Length - 1; i >= 0; i--)
             {
-                if (tbxCommand.Lines[i].Length > 0)
+                if (richTextBoxCommand.Lines[i].Length > 0)
                 {
                     this.length = i + 1;
                     break;
                 }
             }
-            this.description = tbxDescription.Text;
+            this.description = richTextBoxDescription.Text;
             for (int i = 0; i < this.length; i++)
             {
-                this.commands.Add(new Command(tbxCommand.Lines[i], int.Parse(tbxDelay.Lines[i])));
+                this.commands.Add(new Command(richTextBoxCommand.Lines[i], int.Parse(richTextBoxDelay.Lines[i])));
             }
-            Console.WriteLine(this.description);
         }
 
         // Get the description of a sequence
