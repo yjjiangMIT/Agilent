@@ -37,28 +37,39 @@ namespace Agilent
         
     class Sequence
     {
-        private List<Command> commands;
-        private string description;
-        private int length;
-        private string filePath;
-        private string fileName;
+        private List<Command> setup; // SCPI commands that will be executed only once.
+        private List<Command> loop; // SCPI commands that will be executed over and over again.
+        private string description; // Description of this sequence.
+        private string filePath; // Path of the file that stores this sequence.
+        private string fileName; // Name of the file that stores this sequence.
+        public enum CommandType {SETUP, LOOP};
 
         public Sequence()
         {
-            this.commands = new List<Command>();
+            this.setup = new List<Command>();
+            this.loop = new List<Command>();
             this.description = "";
-            this.length = 0;
         }
 
-        // Number of commands in the sequence
-        public int Length
+        // Get the number of commands in setup.
+        public int SetupLength
         {
             get
             {
-                return this.length;
+                return this.setup.Count;
             }
         }
 
+        // Get the number of commands in loop.
+        public int LoopLength
+        {
+            get
+            {
+                return this.loop.Count;
+            }
+        }
+
+        // Get the name of the file that stores this sequence.
         public string FileName
         {
             get
@@ -67,6 +78,7 @@ namespace Agilent
             }
         }
 
+        // Get the path of the file that stores this sequence.
         public string FilePath
         {
             get
@@ -81,19 +93,7 @@ namespace Agilent
             string line;
             string[] splitLine;
 
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (line.StartsWith("Sequence:"))
-                {
-                    break;
-                }
-            }
-            while ((line = reader.ReadLine()) != "")
-            {
-                splitLine = line.Split('#');
-                this.commands.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
-            }
-            this.length = this.commands.Count;
+            // Load discription.
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("Description:"))
@@ -106,54 +106,96 @@ namespace Agilent
                 this.description = line;
             }
 
+            // Load setup.
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line.StartsWith("Setup:"))
+                {
+                    break;
+                }
+            }
+            while ((line = reader.ReadLine()) != "")
+            {
+                splitLine = line.Split('#');
+                this.setup.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
+            }
+
+            // Load loop.
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line.StartsWith("Loop:"))
+                {
+                    break;
+                }
+            }
+            while ((line = reader.ReadLine()) != "")
+            {
+                splitLine = line.Split('#');
+                this.loop.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
+            }
+            
+            // Load file information.
             this.filePath = fileName;
             splitLine = fileName.Split('\\');
             this.fileName = splitLine[splitLine.Length - 1].Split('.')[0];
+
+            // Close StreamReader.
             reader.Close();
         }
 
         // Display a sequence to Form
-        public void DisplaySequence(RichTextBox tbxCommand, RichTextBox tbxDelay, RichTextBox tbxDescription, int currentIndex = -1)
+        public void DisplaySequence(RichTextBox richTextBoxSequence, RichTextBox richTextBoxDelay, RichTextBox richTextBoxDescription, CommandType type, int currentIndex = -1)
         {
-            tbxCommand.Clear();
-            tbxDelay.Clear();
+            int length;
+
+            if (type == CommandType.SETUP)
+            {
+                length = this.setup.Count;
+            }
+            else
+            {
+                length = this.loop.Count;
+            }
+            
+            richTextBoxSequence.Clear();
+            richTextBoxDelay.Clear();
             if (length > 0)
             {
-                for (int i = 0; i < this.length; i++)
+                for (int i = 0; i < length; i++)
                 {
                     if (i == currentIndex)
                     {
-                        tbxCommand.SelectionBackColor = Color.Yellow;
-                        tbxDelay.SelectionBackColor = Color.Yellow;
+                        richTextBoxSequence.SelectionBackColor = Color.Yellow;
+                        richTextBoxDelay.SelectionBackColor = Color.Yellow;
                     }
                     else
                     {
-                        tbxCommand.SelectionBackColor = Color.White;
-                        tbxCommand.SelectionBackColor = Color.White;
+                        richTextBoxSequence.SelectionBackColor = Color.White;
+                        richTextBoxSequence.SelectionBackColor = Color.White;
                     }
-                    tbxCommand.AppendText(this.commands[i].Scpi + "\r\n");
-                    tbxDelay.AppendText(this.commands[i].Delay + "\r\n");
+                    richTextBoxSequence.AppendText(this.setup[i].Scpi + "\r\n");
+                    richTextBoxDelay.AppendText(this.setup[i].Delay + "\r\n");
                 }
             }
-            tbxDescription.Text = this.description;
+            richTextBoxDescription.Text = this.description;
         }
 
         // Load a sequence from Form
-        public void UpdateSequence(RichTextBox richTextBoxCommand, RichTextBox richTextBoxDelay, RichTextBox richTextBoxDescription)
+        public void UpdateSequence(RichTextBox richTextBoxSetup, RichTextBox richTextBoxDelay, RichTextBox richTextBoxDescription)
         {
-            this.commands.Clear();
-            for (int i = richTextBoxCommand.Lines.Length - 1; i >= 0; i--)
+            this.setup.Clear();
+            for (int i = richTextBoxSetup.Lines.Length - 1; i >= 0; i--)
             {
-                if (richTextBoxCommand.Lines[i].Length > 0)
+                if (richTextBoxSetup.Lines[i].Length > 0)
                 {
-                    this.length = i + 1;
+                    this.setupLength = i + 1;
                     break;
                 }
             }
             this.description = richTextBoxDescription.Text;
-            for (int i = 0; i < this.length; i++)
+            for (int i = 0; i < this.setupLength; i++)
             {
-                this.commands.Add(new Command(richTextBoxCommand.Lines[i], int.Parse(richTextBoxDelay.Lines[i])));
+                this.setup.Add(new Command(richTextBoxSetup.Lines[i], int.Parse(richTextBoxDelay.Lines[i])));
             }
         }
 
@@ -166,9 +208,9 @@ namespace Agilent
         // Get a command with given index
         public Command getCommand(int index)
         {
-            if (index < this.length)
+            if (index < this.setupLength)
             {
-                return this.commands[index];
+                return this.setup[index];
             }
             else
             {

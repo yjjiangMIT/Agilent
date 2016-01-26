@@ -11,6 +11,7 @@ namespace Agilent
     {
         private int READ_TIMEOUT = 1000; // Set read timeout to be 1s.
         private int DELAY_BETWEEN_ROUNDS = 0;
+        private int DELAY_BETWEEN_COMMANDS = 20;
         private enum DataType { READOUT, FUNCTION, RESOLUTION };
 
         private Sequence sequence;
@@ -39,19 +40,19 @@ namespace Agilent
                 if (this.expectedDataType == DataType.READOUT)
                 {
                     this.ParseReadout();
+                    Thread.Sleep(DELAY_BETWEEN_COMMANDS);
                     this.comPort.WriteLine("FUNC?");
                     this.expectedDataType = DataType.FUNCTION;
                 }
                 else if (this.expectedDataType == DataType.FUNCTION)
                 {
                     string function = this.comPort.ReadLine().Split('"')[1];
-                    Console.WriteLine(function);
+                    Thread.Sleep(DELAY_BETWEEN_COMMANDS);
                     this.comPort.WriteLine(function + ":RES?");
                     this.expectedDataType = DataType.RESOLUTION;
                 }
                 else if (this.expectedDataType == DataType.RESOLUTION)
                 {
-                    Console.WriteLine(this.readoutCounter);
                     this.ParseResolution();
                     this.expectedDataType = DataType.READOUT;
                 }
@@ -131,7 +132,7 @@ namespace Agilent
                         {
                             sequence = new Sequence();
                             sequence.LoadSequence(reader, openFileDialog1.FileName);
-                            sequence.DisplaySequence(this.richTextBoxCommand, this.richTextBoxDelay, this.richTextBoxDescription);
+                            sequence.DisplaySequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription);
                         }
                     }
                 }
@@ -144,11 +145,21 @@ namespace Agilent
 
         private void buttonRunSequence_Click(object sender, EventArgs e)
         {
-            this.sequence.UpdateSequence(this.richTextBoxCommand, this.richTextBoxDelay, this.richTextBoxDescription);
+            this.sequence.UpdateSequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription);
             this.expectedDataType = DataType.READOUT;
             this.ifAbortImmediately = false;
             Thread threadRunSeq = new Thread(new ThreadStart(this.RunSequence));
             threadRunSeq.Start();
+        }
+
+        private void InitializeSequence()
+        {
+            this.comPort.WriteLine("\x03"); // Stop unfinished job.
+            Thread.Sleep(DELAY_BETWEEN_COMMANDS);
+            this.comPort.WriteLine("*CLS"); // Clear previous setup.
+            Thread.Sleep(DELAY_BETWEEN_COMMANDS);
+            this.comPort.WriteLine("SYST:REM"); // Put DMM in remote state.
+            Thread.Sleep(DELAY_BETWEEN_COMMANDS);
         }
 
         private void RunSequence()
@@ -158,41 +169,40 @@ namespace Agilent
             if (this.InvokeRequired)
             {
                 this.Invoke(new ChangeDisplayStatusCallback(this.ChangeDisplayStatusToRun));
-
                 try
                 {
-                    this.comPort.WriteLine("\x03"); // Stop unfinished job.
-                    this.comPort.WriteLine("*CLS"); // Clear previous setup.
+                    this.InitializeSequence();
+                    do
+                    {
+                        this.ifDataReceived = false;
+                        for (int i = 0; i < this.sequence.Length; i++)
+                        {
+                            currentCommand = this.sequence.getCommand(i);
+                            this.Invoke(new ColorDisplayCurrentCommandCallback(this.ColorDisplayCurrentCommand), new object[] { i });
+
+                            this.comPort.WriteLine(currentCommand.Scpi);
+                            if (currentCommand.Scpi.EndsWith("?"))
+                            {
+                                Console.WriteLine("READ?");
+                                while (!this.ifDataReceived) ; // Do not continue unless some data are received.
+                                this.ifDataReceived = false;
+                            }
+                            if (this.ifAbortImmediately)
+                            {
+                                break;
+                            }
+                            Thread.Sleep(currentCommand.Delay);
+                        }
+                        this.Invoke(new ColorDisplayCurrentCommandCallback(this.ColorDisplayCurrentCommand), new object[] { -1 });
+                        Thread.Sleep(DELAY_BETWEEN_ROUNDS);
+                    }
+                    while (!this.ifAbort && !this.ifAbortImmediately);
+                    this.Invoke(new ChangeDisplayStatusCallback(this.ChangeDisplayStatusToIdle));
                 }
                 catch
                 {
                     // Do nothing.
                 }
-                do
-                {
-                    this.ifDataReceived = false;
-                    for (int i = 0; i < this.sequence.Length; i++)
-                    {
-                        currentCommand = this.sequence.getCommand(i);
-                        this.Invoke(new ColorDisplayCurrentCommandCallback(this.ColorDisplayCurrentCommand), new object[] { i });
-
-                        this.comPort.WriteLine(currentCommand.Scpi);
-                        if (currentCommand.Scpi.EndsWith("?"))
-                        {
-                            while (!this.ifDataReceived) ; // Do not continue unless some data are received.
-                            this.ifDataReceived = false;
-                        }
-                        if (this.ifAbortImmediately)
-                        {
-                            break;
-                        }
-                        Thread.Sleep(currentCommand.Delay);
-                    }
-                    this.Invoke(new ColorDisplayCurrentCommandCallback(this.ColorDisplayCurrentCommand), new object[] { -1 });    
-                }
-                while (!this.ifAbort && !this.ifAbortImmediately);
-                this.Invoke(new ChangeDisplayStatusCallback(this.ChangeDisplayStatusToIdle));
-                Thread.Sleep(DELAY_BETWEEN_ROUNDS);
             }
         }
 
@@ -262,10 +272,11 @@ namespace Agilent
 
         private void buttonRunSeqOnce_Click(object sender, EventArgs e)
         {
-            this.sequence.UpdateSequence(this.richTextBoxCommand, this.richTextBoxDelay, this.richTextBoxDescription);
+            this.sequence.UpdateSequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription);
             this.expectedDataType = DataType.READOUT;
             this.ifAbortImmediately = false;
             this.checkBoxStop.Checked = true;
+            this.buttonConnect.Enabled = false;
             Thread threadRunSeq = new Thread(new ThreadStart(this.RunSequence));
             threadRunSeq.Start();
         }
@@ -274,7 +285,7 @@ namespace Agilent
 
         private void ColorDisplayCurrentCommand(int index)
         {
-            this.sequence.DisplaySequence(this.richTextBoxCommand, this.richTextBoxDelay, this.richTextBoxDescription, index);
+            this.sequence.DisplaySequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription, index);
         }
 
         private delegate void ChangeDisplayStatusCallback();
@@ -285,6 +296,7 @@ namespace Agilent
             this.labelRunStatus.Text = "Status: Running";
             this.buttonRunSequence.Enabled = false;
             this.buttonRunSequenceOnce.Enabled = false;
+            this.buttonConnect.Enabled = false;
         }
 
         private void ChangeDisplayStatusToIdle()
@@ -293,6 +305,7 @@ namespace Agilent
             this.labelRunStatus.Text = "Status: Idle";
             this.buttonRunSequence.Enabled = true;
             this.buttonRunSequenceOnce.Enabled = true;
+            this.buttonConnect.Enabled = true;
         }
 
         private void checkBoxStop_CheckedChanged(object sender, EventArgs e)
@@ -304,12 +317,13 @@ namespace Agilent
         {
             this.richTextBoxReadout.Clear();
             this.richTextBoxResolution.Clear();
+            this.splitContainerReadout.Update();
         }
 
         private void buttonClearSequence_Click(object sender, EventArgs e)
         {
-            this.richTextBoxCommand.Clear();
-            this.richTextBoxDelay.Clear();
+            this.richTextBoxSeup.Clear();
+            this.richTextBoxSetupDelay.Clear();
             this.richTextBoxDescription.Clear();
         }
 
@@ -443,7 +457,7 @@ namespace Agilent
 
         private void WriteSequenceToFile(StreamWriter writer)
         {
-            this.sequence.UpdateSequence(richTextBoxCommand, richTextBoxDelay, richTextBoxDescription);
+            this.sequence.UpdateSequence(richTextBoxSeup, richTextBoxSetupDelay, richTextBoxDescription);
             writer.WriteLine("Sequence:");
             for (int i = 0; i < this.sequence.Length; i++)
             {

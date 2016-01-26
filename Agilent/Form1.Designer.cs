@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.buttonImportSequence = new System.Windows.Forms.Button();
             this.panelDescription = new System.Windows.Forms.Panel();
             this.richTextBoxDescription = new System.Windows.Forms.RichTextBox();
@@ -38,17 +38,22 @@
             this.buttonRunSequence = new System.Windows.Forms.Button();
             this.buttonConnect = new System.Windows.Forms.Button();
             this.labelConnectStatus = new System.Windows.Forms.Label();
-            this.splitContainerSequence = new System.Windows.Forms.SplitContainer();
-            this.richTextBoxCommand = new System.Windows.Forms.RichTextBox();
-            this.richTextBoxDelay = new System.Windows.Forms.RichTextBox();
-            this.labelTitleCommand = new System.Windows.Forms.Label();
-            this.labelTitleDelay = new System.Windows.Forms.Label();
+            this.splitContainerSetup = new System.Windows.Forms.SplitContainer();
+            this.richTextBoxSeup = new System.Windows.Forms.RichTextBox();
+            this.richTextBoxSetupDelay = new System.Windows.Forms.RichTextBox();
+            this.labelTitleSetup = new System.Windows.Forms.Label();
+            this.labelTitleSetupDelay = new System.Windows.Forms.Label();
             this.checkBoxStop = new System.Windows.Forms.CheckBox();
             this.buttonRunSequenceOnce = new System.Windows.Forms.Button();
             this.buttonClearSequence = new System.Windows.Forms.Button();
             this.buttonSaveSequence = new System.Windows.Forms.Button();
             this.panelSequenceFull = new System.Windows.Forms.Panel();
             this.panelSequence = new System.Windows.Forms.Panel();
+            this.labelTitleLoopDelay = new System.Windows.Forms.Label();
+            this.labelTitleLoop = new System.Windows.Forms.Label();
+            this.splitContainerLoop = new System.Windows.Forms.SplitContainer();
+            this.richTextBoxLoop = new System.Windows.Forms.RichTextBox();
+            this.richTextBoxLoopDelay = new System.Windows.Forms.RichTextBox();
             this.panelConnect = new System.Windows.Forms.Panel();
             this.panelImportSequence = new System.Windows.Forms.Panel();
             this.panelRunSequence = new System.Windows.Forms.Panel();
@@ -66,12 +71,16 @@
             this.panelReadoutPlot = new System.Windows.Forms.Panel();
             this.chartReadoutPlot = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panelDescription.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerSequence)).BeginInit();
-            this.splitContainerSequence.Panel1.SuspendLayout();
-            this.splitContainerSequence.Panel2.SuspendLayout();
-            this.splitContainerSequence.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerSetup)).BeginInit();
+            this.splitContainerSetup.Panel1.SuspendLayout();
+            this.splitContainerSetup.Panel2.SuspendLayout();
+            this.splitContainerSetup.SuspendLayout();
             this.panelSequenceFull.SuspendLayout();
             this.panelSequence.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLoop)).BeginInit();
+            this.splitContainerLoop.Panel1.SuspendLayout();
+            this.splitContainerLoop.Panel2.SuspendLayout();
+            this.splitContainerLoop.SuspendLayout();
             this.panelConnect.SuspendLayout();
             this.panelImportSequence.SuspendLayout();
             this.panelRunSequence.SuspendLayout();
@@ -86,10 +95,9 @@
             // 
             // buttonImportSequence
             // 
-            this.buttonImportSequence.Location = new System.Drawing.Point(22, 18);
-            this.buttonImportSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonImportSequence.Location = new System.Drawing.Point(15, 12);
             this.buttonImportSequence.Name = "buttonImportSequence";
-            this.buttonImportSequence.Size = new System.Drawing.Size(262, 62);
+            this.buttonImportSequence.Size = new System.Drawing.Size(175, 40);
             this.buttonImportSequence.TabIndex = 0;
             this.buttonImportSequence.Text = "Import Sequence";
             this.buttonImportSequence.UseVisualStyleBackColor = true;
@@ -98,10 +106,9 @@
             // panelDescription
             // 
             this.panelDescription.Controls.Add(this.richTextBoxDescription);
-            this.panelDescription.Location = new System.Drawing.Point(387, 38);
-            this.panelDescription.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelDescription.Location = new System.Drawing.Point(19, 311);
             this.panelDescription.Name = "panelDescription";
-            this.panelDescription.Size = new System.Drawing.Size(262, 608);
+            this.panelDescription.Size = new System.Drawing.Size(416, 109);
             this.panelDescription.TabIndex = 2;
             // 
             // richTextBoxDescription
@@ -109,28 +116,25 @@
             this.richTextBoxDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.richTextBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBoxDescription.Location = new System.Drawing.Point(0, 0);
-            this.richTextBoxDescription.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.richTextBoxDescription.Name = "richTextBoxDescription";
-            this.richTextBoxDescription.Size = new System.Drawing.Size(262, 608);
+            this.richTextBoxDescription.Size = new System.Drawing.Size(416, 109);
             this.richTextBoxDescription.TabIndex = 0;
             this.richTextBoxDescription.Text = "";
             // 
             // labelTitleDescription
             // 
             this.labelTitleDescription.AutoSize = true;
-            this.labelTitleDescription.Location = new System.Drawing.Point(480, 14);
-            this.labelTitleDescription.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelTitleDescription.Location = new System.Drawing.Point(198, 295);
             this.labelTitleDescription.Name = "labelTitleDescription";
-            this.labelTitleDescription.Size = new System.Drawing.Size(89, 20);
+            this.labelTitleDescription.Size = new System.Drawing.Size(60, 13);
             this.labelTitleDescription.TabIndex = 3;
             this.labelTitleDescription.Text = "Description";
             // 
             // buttonRunSequence
             // 
-            this.buttonRunSequence.Location = new System.Drawing.Point(22, 109);
-            this.buttonRunSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonRunSequence.Location = new System.Drawing.Point(15, 71);
             this.buttonRunSequence.Name = "buttonRunSequence";
-            this.buttonRunSequence.Size = new System.Drawing.Size(262, 62);
+            this.buttonRunSequence.Size = new System.Drawing.Size(175, 40);
             this.buttonRunSequence.TabIndex = 4;
             this.buttonRunSequence.Text = "Run Sequence";
             this.buttonRunSequence.UseVisualStyleBackColor = true;
@@ -138,10 +142,9 @@
             // 
             // buttonConnect
             // 
-            this.buttonConnect.Location = new System.Drawing.Point(22, 38);
-            this.buttonConnect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonConnect.Location = new System.Drawing.Point(15, 25);
             this.buttonConnect.Name = "buttonConnect";
-            this.buttonConnect.Size = new System.Drawing.Size(262, 62);
+            this.buttonConnect.Size = new System.Drawing.Size(175, 40);
             this.buttonConnect.TabIndex = 5;
             this.buttonConnect.Text = "Connect";
             this.buttonConnect.UseVisualStyleBackColor = true;
@@ -150,80 +153,73 @@
             // labelConnectStatus
             // 
             this.labelConnectStatus.AutoSize = true;
-            this.labelConnectStatus.Location = new System.Drawing.Point(80, 14);
-            this.labelConnectStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelConnectStatus.Location = new System.Drawing.Point(53, 9);
             this.labelConnectStatus.Name = "labelConnectStatus";
-            this.labelConnectStatus.Size = new System.Drawing.Size(160, 20);
+            this.labelConnectStatus.Size = new System.Drawing.Size(108, 13);
             this.labelConnectStatus.TabIndex = 6;
             this.labelConnectStatus.Text = "Status: Unconnected";
             // 
-            // splitContainerSequence
+            // splitContainerSetup
             // 
-            this.splitContainerSequence.Location = new System.Drawing.Point(28, 38);
-            this.splitContainerSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.splitContainerSequence.Name = "splitContainerSequence";
+            this.splitContainerSetup.IsSplitterFixed = true;
+            this.splitContainerSetup.Location = new System.Drawing.Point(19, 25);
+            this.splitContainerSetup.Name = "splitContainerSetup";
             // 
-            // splitContainerSequence.Panel1
+            // splitContainerSetup.Panel1
             // 
-            this.splitContainerSequence.Panel1.Controls.Add(this.richTextBoxCommand);
+            this.splitContainerSetup.Panel1.Controls.Add(this.richTextBoxSeup);
             // 
-            // splitContainerSequence.Panel2
+            // splitContainerSetup.Panel2
             // 
-            this.splitContainerSequence.Panel2.Controls.Add(this.richTextBoxDelay);
-            this.splitContainerSequence.Size = new System.Drawing.Size(315, 608);
-            this.splitContainerSequence.SplitterDistance = 225;
-            this.splitContainerSequence.SplitterWidth = 6;
-            this.splitContainerSequence.TabIndex = 9;
+            this.splitContainerSetup.Panel2.Controls.Add(this.richTextBoxSetupDelay);
+            this.splitContainerSetup.Size = new System.Drawing.Size(200, 256);
+            this.splitContainerSetup.SplitterDistance = 142;
+            this.splitContainerSetup.TabIndex = 9;
             // 
-            // richTextBoxCommand
+            // richTextBoxSeup
             // 
-            this.richTextBoxCommand.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.richTextBoxCommand.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBoxCommand.Location = new System.Drawing.Point(0, 0);
-            this.richTextBoxCommand.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.richTextBoxCommand.Name = "richTextBoxCommand";
-            this.richTextBoxCommand.Size = new System.Drawing.Size(225, 608);
-            this.richTextBoxCommand.TabIndex = 0;
-            this.richTextBoxCommand.Text = "";
+            this.richTextBoxSeup.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.richTextBoxSeup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxSeup.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxSeup.Name = "richTextBoxSeup";
+            this.richTextBoxSeup.Size = new System.Drawing.Size(142, 256);
+            this.richTextBoxSeup.TabIndex = 0;
+            this.richTextBoxSeup.Text = "";
             // 
-            // richTextBoxDelay
+            // richTextBoxSetupDelay
             // 
-            this.richTextBoxDelay.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.richTextBoxDelay.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBoxDelay.Location = new System.Drawing.Point(0, 0);
-            this.richTextBoxDelay.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.richTextBoxDelay.Name = "richTextBoxDelay";
-            this.richTextBoxDelay.Size = new System.Drawing.Size(84, 608);
-            this.richTextBoxDelay.TabIndex = 0;
-            this.richTextBoxDelay.Text = "";
+            this.richTextBoxSetupDelay.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.richTextBoxSetupDelay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxSetupDelay.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxSetupDelay.Name = "richTextBoxSetupDelay";
+            this.richTextBoxSetupDelay.Size = new System.Drawing.Size(54, 256);
+            this.richTextBoxSetupDelay.TabIndex = 0;
+            this.richTextBoxSetupDelay.Text = "";
             // 
-            // labelTitleCommand
+            // labelTitleSetup
             // 
-            this.labelTitleCommand.AutoSize = true;
-            this.labelTitleCommand.Location = new System.Drawing.Point(106, 14);
-            this.labelTitleCommand.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelTitleCommand.Name = "labelTitleCommand";
-            this.labelTitleCommand.Size = new System.Drawing.Size(82, 20);
-            this.labelTitleCommand.TabIndex = 10;
-            this.labelTitleCommand.Text = "Command";
+            this.labelTitleSetup.AutoSize = true;
+            this.labelTitleSetup.Location = new System.Drawing.Point(76, 9);
+            this.labelTitleSetup.Name = "labelTitleSetup";
+            this.labelTitleSetup.Size = new System.Drawing.Size(35, 13);
+            this.labelTitleSetup.TabIndex = 10;
+            this.labelTitleSetup.Text = "Setup";
             // 
-            // labelTitleDelay
+            // labelTitleSetupDelay
             // 
-            this.labelTitleDelay.AutoSize = true;
-            this.labelTitleDelay.Location = new System.Drawing.Point(260, 14);
-            this.labelTitleDelay.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelTitleDelay.Name = "labelTitleDelay";
-            this.labelTitleDelay.Size = new System.Drawing.Size(84, 20);
-            this.labelTitleDelay.TabIndex = 11;
-            this.labelTitleDelay.Text = "Delay (ms)";
+            this.labelTitleSetupDelay.AutoSize = true;
+            this.labelTitleSetupDelay.Location = new System.Drawing.Point(163, 9);
+            this.labelTitleSetupDelay.Name = "labelTitleSetupDelay";
+            this.labelTitleSetupDelay.Size = new System.Drawing.Size(56, 13);
+            this.labelTitleSetupDelay.TabIndex = 11;
+            this.labelTitleSetupDelay.Text = "Delay (ms)";
             // 
             // checkBoxStop
             // 
             this.checkBoxStop.AutoSize = true;
-            this.checkBoxStop.Location = new System.Drawing.Point(60, 251);
-            this.checkBoxStop.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxStop.Location = new System.Drawing.Point(40, 163);
             this.checkBoxStop.Name = "checkBoxStop";
-            this.checkBoxStop.Size = new System.Drawing.Size(185, 24);
+            this.checkBoxStop.Size = new System.Drawing.Size(124, 17);
             this.checkBoxStop.TabIndex = 16;
             this.checkBoxStop.Text = "Abort after this round";
             this.checkBoxStop.UseVisualStyleBackColor = true;
@@ -231,10 +227,9 @@
             // 
             // buttonRunSequenceOnce
             // 
-            this.buttonRunSequenceOnce.Location = new System.Drawing.Point(22, 38);
-            this.buttonRunSequenceOnce.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonRunSequenceOnce.Location = new System.Drawing.Point(15, 25);
             this.buttonRunSequenceOnce.Name = "buttonRunSequenceOnce";
-            this.buttonRunSequenceOnce.Size = new System.Drawing.Size(262, 62);
+            this.buttonRunSequenceOnce.Size = new System.Drawing.Size(175, 40);
             this.buttonRunSequenceOnce.TabIndex = 17;
             this.buttonRunSequenceOnce.Text = "Run Sequence Once";
             this.buttonRunSequenceOnce.UseVisualStyleBackColor = true;
@@ -242,10 +237,9 @@
             // 
             // buttonClearSequence
             // 
-            this.buttonClearSequence.Location = new System.Drawing.Point(22, 160);
-            this.buttonClearSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonClearSequence.Location = new System.Drawing.Point(15, 104);
             this.buttonClearSequence.Name = "buttonClearSequence";
-            this.buttonClearSequence.Size = new System.Drawing.Size(262, 62);
+            this.buttonClearSequence.Size = new System.Drawing.Size(175, 40);
             this.buttonClearSequence.TabIndex = 20;
             this.buttonClearSequence.Text = "Clear sequence";
             this.buttonClearSequence.UseVisualStyleBackColor = true;
@@ -253,10 +247,9 @@
             // 
             // buttonSaveSequence
             // 
-            this.buttonSaveSequence.Location = new System.Drawing.Point(22, 89);
-            this.buttonSaveSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonSaveSequence.Location = new System.Drawing.Point(15, 58);
             this.buttonSaveSequence.Name = "buttonSaveSequence";
-            this.buttonSaveSequence.Size = new System.Drawing.Size(262, 62);
+            this.buttonSaveSequence.Size = new System.Drawing.Size(175, 40);
             this.buttonSaveSequence.TabIndex = 21;
             this.buttonSaveSequence.Text = "Save sequence";
             this.buttonSaveSequence.UseVisualStyleBackColor = true;
@@ -269,33 +262,88 @@
             this.panelSequenceFull.Controls.Add(this.panelConnect);
             this.panelSequenceFull.Controls.Add(this.panelImportSequence);
             this.panelSequenceFull.Controls.Add(this.panelRunSequence);
-            this.panelSequenceFull.Location = new System.Drawing.Point(30, 31);
-            this.panelSequenceFull.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelSequenceFull.Location = new System.Drawing.Point(20, 20);
             this.panelSequenceFull.Name = "panelSequenceFull";
-            this.panelSequenceFull.Size = new System.Drawing.Size(1078, 722);
+            this.panelSequenceFull.Size = new System.Drawing.Size(719, 470);
             this.panelSequenceFull.TabIndex = 22;
             // 
             // panelSequence
             // 
-            this.panelSequence.Controls.Add(this.labelTitleDelay);
-            this.panelSequence.Controls.Add(this.labelTitleCommand);
-            this.panelSequence.Controls.Add(this.splitContainerSequence);
+            this.panelSequence.Controls.Add(this.labelTitleLoopDelay);
+            this.panelSequence.Controls.Add(this.labelTitleLoop);
+            this.panelSequence.Controls.Add(this.splitContainerLoop);
+            this.panelSequence.Controls.Add(this.labelTitleSetupDelay);
+            this.panelSequence.Controls.Add(this.labelTitleSetup);
+            this.panelSequence.Controls.Add(this.splitContainerSetup);
             this.panelSequence.Controls.Add(this.labelTitleDescription);
             this.panelSequence.Controls.Add(this.panelDescription);
-            this.panelSequence.Location = new System.Drawing.Point(369, 31);
-            this.panelSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelSequence.Location = new System.Drawing.Point(246, 20);
             this.panelSequence.Name = "panelSequence";
-            this.panelSequence.Size = new System.Drawing.Size(676, 662);
+            this.panelSequence.Size = new System.Drawing.Size(451, 430);
             this.panelSequence.TabIndex = 26;
+            // 
+            // labelTitleLoopDelay
+            // 
+            this.labelTitleLoopDelay.AutoSize = true;
+            this.labelTitleLoopDelay.Location = new System.Drawing.Point(379, 9);
+            this.labelTitleLoopDelay.Name = "labelTitleLoopDelay";
+            this.labelTitleLoopDelay.Size = new System.Drawing.Size(56, 13);
+            this.labelTitleLoopDelay.TabIndex = 14;
+            this.labelTitleLoopDelay.Text = "Delay (ms)";
+            // 
+            // labelTitleLoop
+            // 
+            this.labelTitleLoop.AutoSize = true;
+            this.labelTitleLoop.Location = new System.Drawing.Point(297, 9);
+            this.labelTitleLoop.Name = "labelTitleLoop";
+            this.labelTitleLoop.Size = new System.Drawing.Size(31, 13);
+            this.labelTitleLoop.TabIndex = 13;
+            this.labelTitleLoop.Text = "Loop";
+            // 
+            // splitContainerLoop
+            // 
+            this.splitContainerLoop.IsSplitterFixed = true;
+            this.splitContainerLoop.Location = new System.Drawing.Point(235, 25);
+            this.splitContainerLoop.Name = "splitContainerLoop";
+            // 
+            // splitContainerLoop.Panel1
+            // 
+            this.splitContainerLoop.Panel1.Controls.Add(this.richTextBoxLoop);
+            // 
+            // splitContainerLoop.Panel2
+            // 
+            this.splitContainerLoop.Panel2.Controls.Add(this.richTextBoxLoopDelay);
+            this.splitContainerLoop.Size = new System.Drawing.Size(200, 256);
+            this.splitContainerLoop.SplitterDistance = 142;
+            this.splitContainerLoop.TabIndex = 12;
+            // 
+            // richTextBoxLoop
+            // 
+            this.richTextBoxLoop.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.richTextBoxLoop.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxLoop.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxLoop.Name = "richTextBoxLoop";
+            this.richTextBoxLoop.Size = new System.Drawing.Size(142, 256);
+            this.richTextBoxLoop.TabIndex = 0;
+            this.richTextBoxLoop.Text = "";
+            // 
+            // richTextBoxLoopDelay
+            // 
+            this.richTextBoxLoopDelay.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.richTextBoxLoopDelay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxLoopDelay.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxLoopDelay.Name = "richTextBoxLoopDelay";
+            this.richTextBoxLoopDelay.Size = new System.Drawing.Size(54, 256);
+            this.richTextBoxLoopDelay.TabIndex = 0;
+            this.richTextBoxLoopDelay.Text = "";
             // 
             // panelConnect
             // 
             this.panelConnect.Controls.Add(this.labelConnectStatus);
             this.panelConnect.Controls.Add(this.buttonConnect);
-            this.panelConnect.Location = new System.Drawing.Point(30, 31);
-            this.panelConnect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelConnect.Location = new System.Drawing.Point(20, 20);
             this.panelConnect.Name = "panelConnect";
-            this.panelConnect.Size = new System.Drawing.Size(308, 115);
+            this.panelConnect.Size = new System.Drawing.Size(205, 75);
             this.panelConnect.TabIndex = 25;
             // 
             // panelImportSequence
@@ -303,10 +351,9 @@
             this.panelImportSequence.Controls.Add(this.buttonSaveSequence);
             this.panelImportSequence.Controls.Add(this.buttonClearSequence);
             this.panelImportSequence.Controls.Add(this.buttonImportSequence);
-            this.panelImportSequence.Location = new System.Drawing.Point(30, 154);
-            this.panelImportSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelImportSequence.Location = new System.Drawing.Point(20, 100);
             this.panelImportSequence.Name = "panelImportSequence";
-            this.panelImportSequence.Size = new System.Drawing.Size(308, 237);
+            this.panelImportSequence.Size = new System.Drawing.Size(205, 154);
             this.panelImportSequence.TabIndex = 24;
             // 
             // panelRunSequence
@@ -316,18 +363,16 @@
             this.panelRunSequence.Controls.Add(this.checkBoxStop);
             this.panelRunSequence.Controls.Add(this.buttonRunSequenceOnce);
             this.panelRunSequence.Controls.Add(this.buttonRunSequence);
-            this.panelRunSequence.Location = new System.Drawing.Point(30, 400);
-            this.panelRunSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelRunSequence.Location = new System.Drawing.Point(20, 260);
             this.panelRunSequence.Name = "panelRunSequence";
-            this.panelRunSequence.Size = new System.Drawing.Size(308, 292);
+            this.panelRunSequence.Size = new System.Drawing.Size(205, 190);
             this.panelRunSequence.TabIndex = 23;
             // 
             // buttonStopSequence
             // 
-            this.buttonStopSequence.Location = new System.Drawing.Point(22, 180);
-            this.buttonStopSequence.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonStopSequence.Location = new System.Drawing.Point(15, 117);
             this.buttonStopSequence.Name = "buttonStopSequence";
-            this.buttonStopSequence.Size = new System.Drawing.Size(262, 62);
+            this.buttonStopSequence.Size = new System.Drawing.Size(175, 40);
             this.buttonStopSequence.TabIndex = 25;
             this.buttonStopSequence.Text = "Abort Sequence Immediately";
             this.buttonStopSequence.UseVisualStyleBackColor = true;
@@ -336,10 +381,9 @@
             // labelRunStatus
             // 
             this.labelRunStatus.AutoSize = true;
-            this.labelRunStatus.Location = new System.Drawing.Point(106, 14);
-            this.labelRunStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelRunStatus.Location = new System.Drawing.Point(71, 9);
             this.labelRunStatus.Name = "labelRunStatus";
-            this.labelRunStatus.Size = new System.Drawing.Size(90, 20);
+            this.labelRunStatus.Size = new System.Drawing.Size(60, 13);
             this.labelRunStatus.TabIndex = 22;
             this.labelRunStatus.Text = "Status: Idle";
             // 
@@ -352,18 +396,16 @@
             this.panelReadout.Controls.Add(this.splitContainerReadout);
             this.panelReadout.Controls.Add(this.buttonClearReadout);
             this.panelReadout.Controls.Add(this.buttonSaveReadout);
-            this.panelReadout.Location = new System.Drawing.Point(1155, 31);
-            this.panelReadout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelReadout.Location = new System.Drawing.Point(770, 20);
             this.panelReadout.Name = "panelReadout";
-            this.panelReadout.Size = new System.Drawing.Size(659, 722);
+            this.panelReadout.Size = new System.Drawing.Size(440, 470);
             this.panelReadout.TabIndex = 23;
             // 
             // buttonPlotReadout
             // 
-            this.buttonPlotReadout.Location = new System.Drawing.Point(236, 615);
-            this.buttonPlotReadout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonPlotReadout.Location = new System.Drawing.Point(157, 400);
             this.buttonPlotReadout.Name = "buttonPlotReadout";
-            this.buttonPlotReadout.Size = new System.Drawing.Size(188, 62);
+            this.buttonPlotReadout.Size = new System.Drawing.Size(125, 40);
             this.buttonPlotReadout.TabIndex = 29;
             this.buttonPlotReadout.Text = "Plot readout";
             this.buttonPlotReadout.UseVisualStyleBackColor = true;
@@ -372,27 +414,25 @@
             // labelTitleResolution
             // 
             this.labelTitleResolution.AutoSize = true;
-            this.labelTitleResolution.Location = new System.Drawing.Point(444, 45);
-            this.labelTitleResolution.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelTitleResolution.Location = new System.Drawing.Point(296, 29);
             this.labelTitleResolution.Name = "labelTitleResolution";
-            this.labelTitleResolution.Size = new System.Drawing.Size(85, 20);
+            this.labelTitleResolution.Size = new System.Drawing.Size(57, 13);
             this.labelTitleResolution.TabIndex = 28;
             this.labelTitleResolution.Text = "Resolution";
             // 
             // labelTitleReadout
             // 
             this.labelTitleReadout.AutoSize = true;
-            this.labelTitleReadout.Location = new System.Drawing.Point(144, 45);
-            this.labelTitleReadout.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelTitleReadout.Location = new System.Drawing.Point(96, 29);
             this.labelTitleReadout.Name = "labelTitleReadout";
-            this.labelTitleReadout.Size = new System.Drawing.Size(71, 20);
+            this.labelTitleReadout.Size = new System.Drawing.Size(48, 13);
             this.labelTitleReadout.TabIndex = 27;
             this.labelTitleReadout.Text = "Readout";
             // 
             // splitContainerReadout
             // 
-            this.splitContainerReadout.Location = new System.Drawing.Point(30, 69);
-            this.splitContainerReadout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.splitContainerReadout.IsSplitterFixed = true;
+            this.splitContainerReadout.Location = new System.Drawing.Point(20, 45);
             this.splitContainerReadout.Name = "splitContainerReadout";
             // 
             // splitContainerReadout.Panel1
@@ -402,9 +442,8 @@
             // splitContainerReadout.Panel2
             // 
             this.splitContainerReadout.Panel2.Controls.Add(this.richTextBoxResolution);
-            this.splitContainerReadout.Size = new System.Drawing.Size(600, 518);
-            this.splitContainerReadout.SplitterDistance = 300;
-            this.splitContainerReadout.SplitterWidth = 6;
+            this.splitContainerReadout.Size = new System.Drawing.Size(400, 337);
+            this.splitContainerReadout.SplitterDistance = 200;
             this.splitContainerReadout.TabIndex = 26;
             // 
             // richTextBoxReadout
@@ -412,9 +451,8 @@
             this.richTextBoxReadout.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.richTextBoxReadout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBoxReadout.Location = new System.Drawing.Point(0, 0);
-            this.richTextBoxReadout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.richTextBoxReadout.Name = "richTextBoxReadout";
-            this.richTextBoxReadout.Size = new System.Drawing.Size(300, 518);
+            this.richTextBoxReadout.Size = new System.Drawing.Size(200, 337);
             this.richTextBoxReadout.TabIndex = 0;
             this.richTextBoxReadout.Text = "";
             // 
@@ -423,18 +461,16 @@
             this.richTextBoxResolution.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.richTextBoxResolution.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBoxResolution.Location = new System.Drawing.Point(0, 0);
-            this.richTextBoxResolution.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.richTextBoxResolution.Name = "richTextBoxResolution";
-            this.richTextBoxResolution.Size = new System.Drawing.Size(294, 518);
+            this.richTextBoxResolution.Size = new System.Drawing.Size(196, 337);
             this.richTextBoxResolution.TabIndex = 0;
             this.richTextBoxResolution.Text = "";
             // 
             // buttonClearReadout
             // 
-            this.buttonClearReadout.Location = new System.Drawing.Point(441, 615);
-            this.buttonClearReadout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonClearReadout.Location = new System.Drawing.Point(294, 400);
             this.buttonClearReadout.Name = "buttonClearReadout";
-            this.buttonClearReadout.Size = new System.Drawing.Size(188, 62);
+            this.buttonClearReadout.Size = new System.Drawing.Size(125, 40);
             this.buttonClearReadout.TabIndex = 25;
             this.buttonClearReadout.Text = "Clear readout";
             this.buttonClearReadout.UseVisualStyleBackColor = true;
@@ -442,10 +478,9 @@
             // 
             // buttonSaveReadout
             // 
-            this.buttonSaveReadout.Location = new System.Drawing.Point(30, 615);
-            this.buttonSaveReadout.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonSaveReadout.Location = new System.Drawing.Point(20, 400);
             this.buttonSaveReadout.Name = "buttonSaveReadout";
-            this.buttonSaveReadout.Size = new System.Drawing.Size(188, 62);
+            this.buttonSaveReadout.Size = new System.Drawing.Size(125, 40);
             this.buttonSaveReadout.TabIndex = 24;
             this.buttonSaveReadout.Text = "Save readout";
             this.buttonSaveReadout.UseVisualStyleBackColor = true;
@@ -455,53 +490,54 @@
             // 
             this.panelReadoutPlot.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelReadoutPlot.Controls.Add(this.chartReadoutPlot);
-            this.panelReadoutPlot.Location = new System.Drawing.Point(30, 800);
-            this.panelReadoutPlot.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelReadoutPlot.Location = new System.Drawing.Point(20, 520);
             this.panelReadoutPlot.Name = "panelReadoutPlot";
-            this.panelReadoutPlot.Size = new System.Drawing.Size(1784, 648);
+            this.panelReadoutPlot.Size = new System.Drawing.Size(1190, 422);
             this.panelReadoutPlot.TabIndex = 24;
             // 
             // chartReadoutPlot
             // 
-            chartArea6.Name = "ChartArea1";
-            this.chartReadoutPlot.ChartAreas.Add(chartArea6);
+            chartArea2.Name = "ChartArea1";
+            this.chartReadoutPlot.ChartAreas.Add(chartArea2);
             this.chartReadoutPlot.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend6.Name = "Legend1";
-            this.chartReadoutPlot.Legends.Add(legend6);
+            legend2.Name = "Legend1";
+            this.chartReadoutPlot.Legends.Add(legend2);
             this.chartReadoutPlot.Location = new System.Drawing.Point(0, 0);
-            this.chartReadoutPlot.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chartReadoutPlot.Name = "chartReadoutPlot";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series6.Legend = "Legend1";
-            series6.Name = "Readout";
-            this.chartReadoutPlot.Series.Add(series6);
-            this.chartReadoutPlot.Size = new System.Drawing.Size(1782, 646);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Legend = "Legend1";
+            series2.Name = "Readout";
+            this.chartReadoutPlot.Series.Add(series2);
+            this.chartReadoutPlot.Size = new System.Drawing.Size(1188, 420);
             this.chartReadoutPlot.TabIndex = 0;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(1851, 1038);
+            this.ClientSize = new System.Drawing.Size(1234, 675);
             this.Controls.Add(this.panelReadoutPlot);
             this.Controls.Add(this.panelReadout);
             this.Controls.Add(this.panelSequenceFull);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.Text = "Agilent";
             this.panelDescription.ResumeLayout(false);
-            this.splitContainerSequence.Panel1.ResumeLayout(false);
-            this.splitContainerSequence.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerSequence)).EndInit();
-            this.splitContainerSequence.ResumeLayout(false);
+            this.splitContainerSetup.Panel1.ResumeLayout(false);
+            this.splitContainerSetup.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerSetup)).EndInit();
+            this.splitContainerSetup.ResumeLayout(false);
             this.panelSequenceFull.ResumeLayout(false);
             this.panelSequence.ResumeLayout(false);
             this.panelSequence.PerformLayout();
+            this.splitContainerLoop.Panel1.ResumeLayout(false);
+            this.splitContainerLoop.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLoop)).EndInit();
+            this.splitContainerLoop.ResumeLayout(false);
             this.panelConnect.ResumeLayout(false);
             this.panelConnect.PerformLayout();
             this.panelImportSequence.ResumeLayout(false);
@@ -527,12 +563,12 @@
         private System.Windows.Forms.Button buttonRunSequence;
         private System.Windows.Forms.Button buttonConnect;
         private System.Windows.Forms.Label labelConnectStatus;
-        private System.Windows.Forms.SplitContainer splitContainerSequence;
-        private System.Windows.Forms.RichTextBox richTextBoxCommand;
-        private System.Windows.Forms.RichTextBox richTextBoxDelay;
+        private System.Windows.Forms.SplitContainer splitContainerSetup;
+        private System.Windows.Forms.RichTextBox richTextBoxSeup;
+        private System.Windows.Forms.RichTextBox richTextBoxSetupDelay;
         private System.Windows.Forms.RichTextBox richTextBoxDescription;
-        private System.Windows.Forms.Label labelTitleCommand;
-        private System.Windows.Forms.Label labelTitleDelay;
+        private System.Windows.Forms.Label labelTitleSetup;
+        private System.Windows.Forms.Label labelTitleSetupDelay;
         private System.Windows.Forms.CheckBox checkBoxStop;
         private System.Windows.Forms.Button buttonRunSequenceOnce;
         private System.Windows.Forms.Button buttonClearSequence;
@@ -555,5 +591,10 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chartReadoutPlot;
         private System.Windows.Forms.Button buttonPlotReadout;
         private System.Windows.Forms.Button buttonStopSequence;
+        private System.Windows.Forms.SplitContainer splitContainerLoop;
+        private System.Windows.Forms.RichTextBox richTextBoxLoop;
+        private System.Windows.Forms.RichTextBox richTextBoxLoopDelay;
+        private System.Windows.Forms.Label labelTitleLoopDelay;
+        private System.Windows.Forms.Label labelTitleLoop;
     }
 }
