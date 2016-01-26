@@ -25,6 +25,7 @@ namespace Agilent
                 return this.scpi;
             }
         }
+
         public int Delay
         {
             get
@@ -39,6 +40,8 @@ namespace Agilent
         private List<Command> commands;
         private string description;
         private int length;
+        private string filePath;
+        private string fileName;
 
         public Sequence()
         {
@@ -56,10 +59,28 @@ namespace Agilent
             }
         }
 
+        public string FileName
+        {
+            get
+            {
+                return this.fileName;
+            }
+        }
+
+        public string FilePath
+        {
+            get
+            {
+                return this.filePath;
+            }
+        }
+
         // Load a sequence from a file
-        public void LoadSequence(StreamReader reader)
+        public void LoadSequence(StreamReader reader, string fileName)
         {
             string line;
+            string[] splitLine;
+
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("Sequence:"))
@@ -69,7 +90,7 @@ namespace Agilent
             }
             while ((line = reader.ReadLine()) != "")
             {
-                string[] splitLine = line.Split('#');
+                splitLine = line.Split('#');
                 this.commands.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
             }
             this.length = this.commands.Count;
@@ -84,6 +105,11 @@ namespace Agilent
             {
                 this.description = line;
             }
+
+            this.filePath = fileName;
+            splitLine = fileName.Split('\\');
+            this.fileName = splitLine[splitLine.Length - 1].Split('.')[0];
+            reader.Close();
         }
 
         // Display a sequence to Form
