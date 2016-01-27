@@ -9,6 +9,10 @@ namespace Agilent
 {
     public partial class Form1 : Form
     {
+        /* Set read timeout to be 1s. Notice that a DataReceivedEventHandler is used, 
+           so the program listens to the serial and reads when there is something in the read buffer.
+           This means that read timeout does not need to be long.
+        */
         private int READ_TIMEOUT = 1000; // Set read timeout to be 1s.
         private int DELAY_BETWEEN_ROUNDS = 0;
         private int DELAY_BETWEEN_COMMANDS = 20;
