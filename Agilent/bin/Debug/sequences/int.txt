@@ -1,0 +1,11 @@
+Description:
+One measurements of DC voltage after internal trigger.
+
+Setup:
+FUNC "VOLT:DC" #20
+SAMP:COUN 1 #20
+TRIG:SOUR INT #20
+
+Loop:
+READ? #20
+VOLT:RES? #20

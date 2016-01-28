@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using System.IO.Ports;
 using System.Drawing;
 
 namespace Agilent
 {
     class Command
     {
+        /** Command class: stores a string of SCPI command and the delay time after this command. */
+
         public Command(string scpi, int delay)
         {
             this.scpi = scpi;
@@ -34,7 +35,7 @@ namespace Agilent
             }
         }
     }
-        
+
     class Sequence
     {
         private List<Command> setup; // SCPI commands that will be executed only once.
@@ -42,8 +43,7 @@ namespace Agilent
         private string description; // Description of this sequence.
         private string filePath; // Path of the file that stores this sequence.
         private string fileName; // Name of the file that stores this sequence.
-        public enum CommandType {SETUP, LOOP};
-
+        
         public Sequence()
         {
             this.setup = new List<Command>();
@@ -51,7 +51,6 @@ namespace Agilent
             this.description = "";
         }
 
-        // Get the number of commands in setup.
         public int SetupLength
         {
             get
@@ -60,7 +59,6 @@ namespace Agilent
             }
         }
 
-        // Get the number of commands in loop.
         public int LoopLength
         {
             get
@@ -69,7 +67,6 @@ namespace Agilent
             }
         }
 
-        // Get the name of the file that stores this sequence.
         public string FileName
         {
             get
@@ -78,7 +75,6 @@ namespace Agilent
             }
         }
 
-        // Get the path of the file that stores this sequence.
         public string FilePath
         {
             get
@@ -87,13 +83,15 @@ namespace Agilent
             }
         }
 
-        // Load a sequence from a file
         public void LoadSequence(StreamReader reader, string fileName)
         {
+            /** Load a sequence from a file. */
+
             string line;
             string[] splitLine;
 
-            // Load discription.
+            /* Load discription. */
+           
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("Description:"))
@@ -101,116 +99,252 @@ namespace Agilent
                     break;
                 }
             }
-            if ((line = reader.ReadLine()) != null)
+            while ((line = reader.ReadLine()) != null)
             {
-                this.description = line;
+                if (line.Length > 0)
+                {
+                    this.description = line;
+                    Console.WriteLine(this.description);
+                    break;
+                }
             }
 
-            // Load setup.
+            /* Load setup. */
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("Setup:"))
                 {
+                    Console.WriteLine(line);
                     break;
                 }
             }
-            while ((line = reader.ReadLine()) != "")
-            {
-                splitLine = line.Split('#');
-                this.setup.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
-            }
-
-            // Load loop.
             while ((line = reader.ReadLine()) != null)
             {
-                if (line.StartsWith("Loop:"))
+                if (line.Length > 0)
                 {
-                    break;
+                    if (line.StartsWith("Loop:"))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (line.Length > 0)
+                        {
+                            Console.WriteLine(line + "ddd");
+                            splitLine = line.Split('#');
+                            this.setup.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
+                        }
+                    }
                 }
             }
-            while ((line = reader.ReadLine()) != "")
+          
+            /* Load loop. */
+            while ((line = reader.ReadLine()) != null)
             {
-                splitLine = line.Split('#');
-                this.loop.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
+                if (line.Length > 0)
+                {
+                    Console.WriteLine(line + "ddd");
+                    splitLine = line.Split('#');
+                    this.loop.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
+                }
             }
-            
-            // Load file information.
+
+            /* Load file information. */
             this.filePath = fileName;
             splitLine = fileName.Split('\\');
             this.fileName = splitLine[splitLine.Length - 1].Split('.')[0];
 
-            // Close StreamReader.
+            /* Close StreamReader. */
             reader.Close();
         }
 
-        // Display a sequence to Form
-        public void DisplaySequence(RichTextBox richTextBoxSequence, RichTextBox richTextBoxDelay, RichTextBox richTextBoxDescription, CommandType type, int currentIndex = -1)
+        public void SaveSequence(StreamWriter writer)
         {
-            int length;
+            /** Write this sequence to a file. */
 
-            if (type == CommandType.SETUP)
+            /* Write description. */
+            writer.WriteLine("Description:");
+            writer.WriteLine(this.ToString());
+            writer.Write(Environment.NewLine);
+
+            /* Write setup. */
+            writer.WriteLine("Setup:");
+            for (int i = 0; i < this.setup.Count; i++)
             {
-                length = this.setup.Count;
+                writer.Write(this.GetSetupCommand(i).Scpi);
+                writer.Write(" #");
+                writer.WriteLine(this.GetSetupCommand(i).Delay);
             }
-            else
+            writer.Write(Environment.NewLine);
+
+            /* Write loop. */
+            writer.WriteLine("Loop:");
+            for (int i = 0; i < this.loop.Count; i++)
             {
-                length = this.loop.Count;
+                writer.Write(this.GetLoopCommand(i).Scpi);
+                writer.Write(" #");
+                writer.WriteLine(this.GetLoopCommand(i).Delay);
             }
-            
-            richTextBoxSequence.Clear();
-            richTextBoxDelay.Clear();
-            if (length > 0)
+        }
+
+        public void DisplaySetup(RichTextBox richTextBoxSetup, RichTextBox richTextBoxSetupDelay, int currentIndex = -1)
+        {
+            /** Display setup sequence on the GUI. Highlight the indexed command. */
+
+            richTextBoxSetup.Clear();
+            richTextBoxSetupDelay.Clear();
+
+            /* Command #index is highlighted. */
+            if (this.setup.Count > 0)
             {
-                for (int i = 0; i < length; i++)
+                for (int i = 0; i < this.setup.Count; i++)
                 {
                     if (i == currentIndex)
                     {
-                        richTextBoxSequence.SelectionBackColor = Color.Yellow;
-                        richTextBoxDelay.SelectionBackColor = Color.Yellow;
+                        richTextBoxSetup.SelectionBackColor = Color.Yellow;
+                        richTextBoxSetupDelay.SelectionBackColor = Color.Yellow;
+                        richTextBoxSetup.SelectionStart = richTextBoxSetup.Text.Length;
+                        richTextBoxSetup.ScrollToCaret();
+                        richTextBoxSetupDelay.SelectionStart = richTextBoxSetupDelay.Text.Length;
+                        richTextBoxSetupDelay.ScrollToCaret();
                     }
                     else
                     {
-                        richTextBoxSequence.SelectionBackColor = Color.White;
-                        richTextBoxSequence.SelectionBackColor = Color.White;
+                        richTextBoxSetup.SelectionBackColor = Color.White;
+                        richTextBoxSetupDelay.SelectionBackColor = Color.White;
                     }
-                    richTextBoxSequence.AppendText(this.setup[i].Scpi + "\r\n");
-                    richTextBoxDelay.AppendText(this.setup[i].Delay + "\r\n");
+                    richTextBoxSetup.AppendText(this.setup[i].Scpi + "\r\n");
+                    richTextBoxSetupDelay.AppendText(this.setup[i].Delay + "\r\n");                 
                 }
             }
-            richTextBoxDescription.Text = this.description;
         }
 
-        // Load a sequence from Form
-        public void UpdateSequence(RichTextBox richTextBoxSetup, RichTextBox richTextBoxDelay, RichTextBox richTextBoxDescription)
+        public void DisplayLoop(RichTextBox richTextBoxLoop, RichTextBox richTextBoxLoopDelay, int currentIndex = -1)
         {
-            this.setup.Clear();
-            for (int i = richTextBoxSetup.Lines.Length - 1; i >= 0; i--)
+            /** Display loop sequence on the GUI. Highlight the indexed command. */
+
+            richTextBoxLoop.Clear();
+            richTextBoxLoopDelay.Clear();
+
+            /* Command #index is highlighted. */
+            if (this.loop.Count > 0)
             {
-                if (richTextBoxSetup.Lines[i].Length > 0)
+                for (int i = 0; i < this.loop.Count; i++)
                 {
-                    this.setupLength = i + 1;
-                    break;
+                    if (i == currentIndex)
+                    {
+                        richTextBoxLoop.SelectionBackColor = Color.Yellow;
+                        richTextBoxLoopDelay.SelectionBackColor = Color.Yellow;
+                        richTextBoxLoop.SelectionStart = richTextBoxLoop.Text.Length;
+                        richTextBoxLoop.ScrollToCaret();
+                        richTextBoxLoopDelay.SelectionStart = richTextBoxLoopDelay.Text.Length;
+                        richTextBoxLoopDelay.ScrollToCaret();
+                    }
+                    else
+                    {
+                        richTextBoxLoop.SelectionBackColor = Color.White;
+                        richTextBoxLoopDelay.SelectionBackColor = Color.White;
+                    }
+                    richTextBoxLoop.AppendText(this.loop[i].Scpi + "\r\n");
+                    richTextBoxLoopDelay.AppendText(this.loop[i].Delay + "\r\n");
+                    
                 }
-            }
-            this.description = richTextBoxDescription.Text;
-            for (int i = 0; i < this.setupLength; i++)
-            {
-                this.setup.Add(new Command(richTextBoxSetup.Lines[i], int.Parse(richTextBoxDelay.Lines[i])));
             }
         }
 
-        // Get the description of a sequence
+        public void DisplayDescription(RichTextBox richTextBoxDescription)
+        {
+            /** Display description on the GUI. */
+
+            richTextBoxDescription.Text = this.description;
+            richTextBoxDescription.SelectionStart = richTextBoxDescription.Text.Length;
+            richTextBoxDescription.ScrollToCaret();
+        }
+
+        public void Update(RichTextBox richTextBoxSetup, RichTextBox richTextBoxSetupDelay,
+            RichTextBox richTextBoxLoop, RichTextBox richTextBoxLoopDelay, RichTextBox richTextBoxDescription)
+        {
+            /** Update sequence by loading from textboxes. */
+
+            int length;
+            string scpi;
+            int delay;
+
+            this.setup.Clear();
+            this.loop.Clear();
+            
+            /* Update setup. */
+            length = richTextBoxSetup.Lines.Length;
+            for (int i = 0; i < length; i++)
+            {
+
+                scpi = richTextBoxSetup.Lines[i];
+                if (scpi.Length > 0)
+                {
+                    try
+                    {
+                        delay = int.Parse(richTextBoxSetupDelay.Lines[i]);
+                    }
+                    catch
+                    {
+                        delay = 0;
+                    }
+                    this.setup.Add(new Command(scpi, delay));
+                }
+            }
+
+            /* Update loop. */
+            length = richTextBoxLoop.Lines.Length;
+            for (int i = 0; i < length; i++)
+            {
+
+                scpi = richTextBoxLoop.Lines[i];
+                if (scpi.Length > 0)
+                {
+                    try
+                    {
+                        delay = int.Parse(richTextBoxLoopDelay.Lines[i]);
+                    }
+                    catch
+                    {
+                        delay = 0;
+                    }
+                    this.loop.Add(new Command(scpi, delay));
+                }
+            }
+
+            /* Update description. */
+            this.description = richTextBoxDescription.Text;
+        }
+
         public override string ToString()
         {
+            /** Get the description of the sequence. */
+
             return this.description;
         }
 
-        // Get a command with given index
-        public Command getCommand(int index)
+        public Command GetSetupCommand(int index)
         {
-            if (index < this.setupLength)
+            /* Get a setup command with given index. */
+
+            if (index < this.setup.Count)
             {
                 return this.setup[index];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Command GetLoopCommand(int index)
+        {
+            /* Get a loop command with given index. */
+
+            if (index < this.loop.Count)
+            {
+                return this.loop[index];
             }
             else
             {

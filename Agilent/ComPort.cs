@@ -34,13 +34,5 @@ namespace Agilent
         {
 
         }
-
-        public int readtimeout
-        {
-            set
-            {
-                this.ReadTimeout = value;
-            }
-        }
     }
 }

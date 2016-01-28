@@ -3,15 +3,15 @@ using System.Windows.Forms;
 
 namespace Agilent
 {
-    public partial class Form2 : Form
+    public partial class ConnectForm : Form
     {
-        public Form2(Form1 form1)
+        public ConnectForm(Form1 form1)
         {
             InitializeComponent();
             this.fatherForm = form1;
         }
 
-        private void Form2_Load(object sender, EventArgs e)
+        private void ConnectForm_Load(object sender, EventArgs e)
         {
             //Do not remove this empty method.
         }
@@ -25,7 +25,7 @@ namespace Agilent
             string parity = lbxParity.Text;
 
             this.fatherForm.OpenPort(portName, baudRate, parity, dataBits, stopBits);
-            this.fatherForm.UpdateConnStatus();
+            this.fatherForm.UpdateConnectionDisplay();
             this.Close();
         }
 

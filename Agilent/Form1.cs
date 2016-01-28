@@ -9,199 +9,151 @@ namespace Agilent
 {
     public partial class Form1 : Form
     {
-        /* Set read timeout to be 1s. Notice that a DataReceivedEventHandler is used, 
-           so the program listens to the serial and reads when there is something in the read buffer.
-           This means that read timeout does not need to be long.
-        */
-        private int READ_TIMEOUT = 1000; // Set read timeout to be 1s.
-        private int DELAY_BETWEEN_ROUNDS = 0;
-        private int DELAY_BETWEEN_COMMANDS = 20;
-        private enum DataType { READOUT, FUNCTION, RESOLUTION };
+        /** Set some time constants */
+        private static int DELAY_BETWEEN_ROUNDS = 0;
+        private static int DELAY_BETWEEN_COMMANDS = 20;
 
-        private Sequence sequence;
-        private ComPort comPort;
-        private Form2 childForm;
-        private bool ifAbort;
-        private bool ifDataReceived;
-        private bool ifAbortImmediately;
-        private int readoutCounter;
-        private DataType expectedDataType;
+        private static bool IS_WORK_MODE = false; // Set false if want to debug without serial connection.
+        
+        private enum DataType { MEASUREMENT, RESOLUTION }; // Distinguish various types of read-in data.
+
+        private Sequence sequence; // Stores a sequence of SCPI commands and delay times.
+        private ComPort comPort; // RS232 serial port.
+        private ConnectForm connectForm; // Pop-up form that shows serial connection options.
+        private DataType expectedDataType; // Expected type of data.
+        private bool ifAbort; // If abort sequence after current iteration.
+        private bool ifAbortImmediately; // If abort sequence immediately and jump out of current iteration.
+        private bool ifDataReceived; // If expected data has been received.
+        private int outputCounter; // Count number of outputs in a single measurement. 
 
         public Form1()
         {
             InitializeComponent();
-            this.childForm = new Form2(this);
+            this.connectForm = new ConnectForm(this);
+            this.connectForm.Dispose();
             this.comPort = new ComPort();
-            this.childForm.Dispose();
+            this.sequence = new Sequence();
+
+            this.checkBoxStop.Checked = false;
             this.ifAbort = false;
-            this.expectedDataType = DataType.READOUT;
+
+            /* Disable buttons that writes to serial port. */
+            if (IS_WORK_MODE)
+            {
+                this.buttonRunSequence.Enabled = false;
+                this.buttonRunSequenceOnce.Enabled = false;
+                this.buttonStopSequence.Enabled = false;
+            }
         }
 
-        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            try
-            {
-                if (this.expectedDataType == DataType.READOUT)
-                {
-                    this.ParseReadout();
-                    Thread.Sleep(DELAY_BETWEEN_COMMANDS);
-                    this.comPort.WriteLine("FUNC?");
-                    this.expectedDataType = DataType.FUNCTION;
-                }
-                else if (this.expectedDataType == DataType.FUNCTION)
-                {
-                    string function = this.comPort.ReadLine().Split('"')[1];
-                    Thread.Sleep(DELAY_BETWEEN_COMMANDS);
-                    this.comPort.WriteLine(function + ":RES?");
-                    this.expectedDataType = DataType.RESOLUTION;
-                }
-                else if (this.expectedDataType == DataType.RESOLUTION)
-                {
-                    this.ParseResolution();
-                    this.expectedDataType = DataType.READOUT;
-                }
-            }
-            catch
-            {
-                this.ParseResolution();
-                this.expectedDataType = DataType.READOUT;
-            }
 
-        }
+
+        /** *********************************************** */
+        /** *** All about setting up serial connection. *** */
+        /** *********************************************** */
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
+            /** Connect/disconnect to DMM via RS232. */
+
             if (this.comPort.IsOpen)
             {
                 this.comPort.Close();
+                /* Disable buttons that writes to serial port. */
+                if (IS_WORK_MODE)
+                {
+                    this.buttonRunSequence.Enabled = false;
+                    this.buttonRunSequenceOnce.Enabled = false;
+                    this.buttonStopSequence.Enabled = false;
+                }
             }
             else
             {
-                if (this.childForm.IsDisposed)
+                if (this.connectForm.IsDisposed)
                 {
-                    this.childForm = new Form2(this);
-                    this.childForm.Show();
+                    this.connectForm = new ConnectForm(this);
+                    this.connectForm.Show();
                 }
             }
-            this.UpdateConnStatus();
+            this.UpdateConnectionDisplay();
         }
 
         public void OpenPort(string portName, int baudRate, string parity, int dataBits, int stopBits)
         {
+            /** Open serial port that talks to the DMM. */
+
             this.comPort = new ComPort(portName, baudRate, parity, dataBits, stopBits);
             this.comPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             try
             {
                 this.comPort.Open();
-                this.comPort.ReadTimeout = READ_TIMEOUT;
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
+                // Do nothing.
             }
         }
 
-        public void UpdateConnStatus()
+        public void UpdateConnectionDisplay()
         {
+            /** Update GUI display to reflect current connection status. */
+
             if (this.comPort.IsOpen)
             {
                 buttonConnect.Text = "Disconnect";
                 labelConnectStatus.Text = "Status: Connected";
+                this.buttonRunSequence.Enabled = true;
+                this.buttonRunSequenceOnce.Enabled = true;
+                this.buttonStopSequence.Enabled = true;
             }
             else
             {
                 buttonConnect.Text = "Connect";
                 labelConnectStatus.Text = "Status: Unconnected";
+                if (IS_WORK_MODE)
+                {
+                    this.buttonRunSequence.Enabled = false;
+                    this.buttonRunSequenceOnce.Enabled = false;
+                    this.buttonStopSequence.Enabled = false;
+                }
             }
         }
 
+
+
+        /** ************************************* */
+        /** *** All about running a sequence. *** */
+        /** ************************************* */
+
+        /** Button operations on a sequence. */
         private void buttonImportSequence_Click(object sender, EventArgs e)
         {
+            /** Load a sequence from .txt file. */
+
             Stream stream = null;
             StreamReader reader = null;
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
 
-            openFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"sequences";
-            openFileDialog1.Filter = "txt files(*.txt)|*.txt|All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 1;
-            openFileDialog1.RestoreDirectory = true;
+            openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"sequences";
+            openFileDialog.Filter = "txt files(*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.RestoreDirectory = true;
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if ((stream = openFileDialog1.OpenFile()) != null)
+                    if ((stream = openFileDialog.OpenFile()) != null)
                     {
                         using (reader = new StreamReader(stream))
                         {
-                            sequence = new Sequence();
-                            sequence.LoadSequence(reader, openFileDialog1.FileName);
-                            sequence.DisplaySequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription);
+                            /* Load the sequence and show it on the form. */
+                            this.sequence.LoadSequence(reader, openFileDialog.FileName);
+                            this.sequence.DisplaySetup(this.richTextBoxSetup, this.richTextBoxSetupDelay);
+                            this.sequence.DisplayLoop(this.richTextBoxLoop, this.richTextBoxLoopDelay);
+                            this.sequence.DisplayDescription(this.richTextBoxDescription);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-            }
-        }
-
-        private void buttonRunSequence_Click(object sender, EventArgs e)
-        {
-            this.sequence.UpdateSequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription);
-            this.expectedDataType = DataType.READOUT;
-            this.ifAbortImmediately = false;
-            Thread threadRunSeq = new Thread(new ThreadStart(this.RunSequence));
-            threadRunSeq.Start();
-        }
-
-        private void InitializeSequence()
-        {
-            this.comPort.WriteLine("\x03"); // Stop unfinished job.
-            Thread.Sleep(DELAY_BETWEEN_COMMANDS);
-            this.comPort.WriteLine("*CLS"); // Clear previous setup.
-            Thread.Sleep(DELAY_BETWEEN_COMMANDS);
-            this.comPort.WriteLine("SYST:REM"); // Put DMM in remote state.
-            Thread.Sleep(DELAY_BETWEEN_COMMANDS);
-        }
-
-        private void RunSequence()
-        {
-            Command currentCommand;
-
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new ChangeDisplayStatusCallback(this.ChangeDisplayStatusToRun));
-                try
-                {
-                    this.InitializeSequence();
-                    do
-                    {
-                        this.ifDataReceived = false;
-                        for (int i = 0; i < this.sequence.Length; i++)
-                        {
-                            currentCommand = this.sequence.getCommand(i);
-                            this.Invoke(new ColorDisplayCurrentCommandCallback(this.ColorDisplayCurrentCommand), new object[] { i });
-
-                            this.comPort.WriteLine(currentCommand.Scpi);
-                            if (currentCommand.Scpi.EndsWith("?"))
-                            {
-                                Console.WriteLine("READ?");
-                                while (!this.ifDataReceived) ; // Do not continue unless some data are received.
-                                this.ifDataReceived = false;
-                            }
-                            if (this.ifAbortImmediately)
-                            {
-                                break;
-                            }
-                            Thread.Sleep(currentCommand.Delay);
-                        }
-                        this.Invoke(new ColorDisplayCurrentCommandCallback(this.ColorDisplayCurrentCommand), new object[] { -1 });
-                        Thread.Sleep(DELAY_BETWEEN_ROUNDS);
-                    }
-                    while (!this.ifAbort && !this.ifAbortImmediately);
-                    this.Invoke(new ChangeDisplayStatusCallback(this.ChangeDisplayStatusToIdle));
                 }
                 catch
                 {
@@ -210,42 +162,325 @@ namespace Agilent
             }
         }
 
-        private delegate void ParseCallback();
-
-        private void ParseReadout()
+        private void buttonClearSequence_Click(object sender, EventArgs e)
         {
-            string[] readout;
+            /** Clear sequence on display. */
 
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new ParseCallback(this.ParseReadout));
-            }
-            else
+            this.richTextBoxSetup.Clear();
+            this.richTextBoxSetupDelay.Clear();
+            this.richTextBoxLoop.Clear();
+            this.richTextBoxLoopDelay.Clear();
+            this.richTextBoxDescription.Clear();
+        }
+
+        private void buttonRunSequence_Click(object sender, EventArgs e)
+        {
+            /** Run sequence over and over again. */
+
+            Thread threadRunSeq = new Thread(new ThreadStart(this.RunSequence));
+            threadRunSeq.Start();
+        }
+
+        private void buttonRunSequenceOnce_Click(object sender, EventArgs e)
+        {
+            /** Run sequence only once. */
+
+            this.checkBoxStop.Checked = true;
+            Thread threadRunSeq = new Thread(new ThreadStart(this.RunSequence));
+            threadRunSeq.Start();
+        }
+
+        private void buttonSaveSequence_Click(object sender, EventArgs e)
+        {
+            /** Save the displayed sequence to file. */
+
+            Stream stream = null;
+            StreamWriter writer = null;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"sequences";
+            saveFileDialog.Filter = "txt files(*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = this.sequence.FileName;
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    readout = this.comPort.ReadLine().Split(',');
-                    this.readoutCounter = 0;
-                    foreach (string oneLine in readout)
+                    if ((stream = saveFileDialog.OpenFile()) != null)
                     {
-                        if (oneLine.Length > 0)
+                        using (writer = new StreamWriter(stream))
                         {
-                            this.richTextBoxReadout.AppendText(oneLine.TrimEnd((char)13) + Environment.NewLine);
-                            this.readoutCounter++;
+                            this.sequence.Update(this.richTextBoxSetup, this.richTextBoxSetupDelay,
+                                this.richTextBoxLoop, this.richTextBoxLoopDelay, this.richTextBoxDescription);
+                            this.sequence.SaveSequence(writer);
                         }
                     }
                 }
                 catch
                 {
-                    Console.WriteLine("Readout error: timeout!");
+                    // Do nothing.
                 }
+            }
+        }
+
+        /** Change status to run/idle. */
+        private delegate void ChangeStatusCallback();
+
+        private void ChangeStatusToRun()
+        {
+            this.sequence.Update(this.richTextBoxSetup, this.richTextBoxSetupDelay,
+                this.richTextBoxLoop, this.richTextBoxLoopDelay, this.richTextBoxDescription);
+
+            this.ifAbortImmediately = false;
+            this.ifDataReceived = false;
+            this.ifAbort = this.checkBoxStop.Checked;
+
+            this.labelRunStatus.Text = "Status: Running";
+            this.buttonRunSequence.Enabled = false;
+            this.buttonRunSequenceOnce.Enabled = false;
+            this.buttonConnect.Enabled = false;
+        }
+
+        private void ChangeStatusToIdle()
+        {
+            this.checkBoxStop.Checked = false;
+            this.labelRunStatus.Text = "Status: Idle";
+            this.buttonRunSequence.Enabled = true;
+            this.buttonRunSequenceOnce.Enabled = true;
+            this.buttonConnect.Enabled = true;
+        }
+
+        /** Initialize and run a sequence on DMM. */
+        private void InitializeDMM()
+        {
+            /** Send commands to initialize DMM. */
+
+            if (IS_WORK_MODE)
+            {
+                this.comPort.WriteLine("\x03"); // Stop unfinished job.
+                Thread.Sleep(DELAY_BETWEEN_COMMANDS);
+                this.comPort.WriteLine("*CLS"); // Clear previous setup.
+                Thread.Sleep(DELAY_BETWEEN_COMMANDS);
+                this.comPort.WriteLine("SYST:REM"); // Put DMM in remote state.
+                Thread.Sleep(DELAY_BETWEEN_COMMANDS);
+            }
+            else
+            {
+                Console.WriteLine("\x03");
+                Console.WriteLine("*CLS");
+                Console.WriteLine("SYST:REM");
+            }
+        }
+
+        private void RunSequence()
+        {
+            /** Run setup once and run loop until an abort instruction. */
+
+            Command currentCommand;
+
+            try // Just in case serial connection breaks down unexpectedly.
+            {
+                if (this.InvokeRequired)
+                {
+                    /* Change display status to run. */
+                    this.Invoke(new ChangeStatusCallback(this.ChangeStatusToRun));
+
+                    this.InitializeDMM();
+
+                    /* Run setup commands. */
+                    for (int i = 0; i < this.sequence.SetupLength; i++)
+                    {
+                        /* Hightlight current command. */
+                        this.Invoke(new ColorDisplayCommandCallback
+                            (this.ColorDisplayCurrentSetup), new object[] { i });
+
+                        currentCommand = this.sequence.GetSetupCommand(i);
+                        if (IS_WORK_MODE)
+                        {
+                            this.comPort.WriteLine(currentCommand.Scpi); // Send command to DMM.
+                        }
+                        else
+                        {
+                            Console.WriteLine(currentCommand.Scpi);
+                        }
+
+                        if (this.ifAbortImmediately)
+                        {
+                            break;
+                        }
+                        Thread.Sleep(currentCommand.Delay);
+                    }
+
+                    /* Remove hightlight. */
+                    this.Invoke(new ColorDisplayCommandCallback
+                        (this.ColorDisplayCurrentSetup), new object[] { -1 });
+
+                    /* Run loop commands. */
+                    /* Outer iteration: run loop commands over and over again. */
+                    do
+                    {
+                        if (this.ifAbortImmediately)
+                        {
+                            break;
+                        }
+
+                        /* Inner iteration: run each command in loop. */
+                        for (int i = 0; i < this.sequence.LoopLength; i++)
+                        {
+                            /* Highlight current command. */
+                            this.Invoke(new ColorDisplayCommandCallback
+                                (this.ColorDisplayCurrentLoop), new object[] { i });
+
+                            currentCommand = this.sequence.GetLoopCommand(i);
+                            if (IS_WORK_MODE)
+                            {
+                                this.comPort.WriteLine(currentCommand.Scpi); // Send command to DMM.
+                            }
+                            else
+                            {
+                                Console.WriteLine(currentCommand.Scpi);
+                            }
+
+                            /* When a measurement request is sent. */
+                            if (currentCommand.Scpi.EndsWith("?"))
+                            {
+                                if (currentCommand.Scpi.EndsWith("RES?")) // Ask for a resolution.
+                                {
+                                    this.expectedDataType = DataType.RESOLUTION;
+                                }
+                                else // Ask for a measurement.
+                                {
+                                    this.expectedDataType = DataType.MEASUREMENT;
+                                }
+                                while (!this.ifDataReceived && IS_WORK_MODE) ;
+                                    // Do not continue unless some data are received.
+                                this.ifDataReceived = false;
+                            }
+
+                            if (this.ifAbortImmediately)
+                            {
+                                break;
+                            }
+                            Thread.Sleep(currentCommand.Delay);
+                        }
+
+                        /* Remove hightlight. */
+                        this.Invoke(new ColorDisplayCommandCallback
+                            (this.ColorDisplayCurrentLoop), new object[] { -1 });
+
+                        /* Delay before the next round. */
+                        Thread.Sleep(DELAY_BETWEEN_ROUNDS);
+                    }
+                    while (!this.ifAbort);
+
+                    /* Change display status to idle. */
+                    this.Invoke(new ChangeStatusCallback(this.ChangeStatusToIdle));
+                }
+            }
+            catch
+            {
+                // Do nothing.
+            }
+        }
+
+        /** Stop running sequence. */
+        private void buttonStopSequence_Click(object sender, EventArgs e)
+        {
+            /* Abort sequence immediately when button is clicked. */
+
+            try
+            {
+                if (IS_WORK_MODE)
+                {
+                    this.comPort.WriteLine("\x03");
+                }
+                else
+                {
+                    Console.WriteLine("\x03");
+                }
+                this.ifAbort = true;
+                this.ifAbortImmediately = true;
+                this.ifDataReceived = true;
+            }
+            catch
+            {
+                // Do nothing.
+            }
+        }
+
+        private void checkBoxStop_CheckedChanged(object sender, EventArgs e)
+        {
+            /* Do not run another round if checked. */
+
+            this.ifAbort = this.checkBoxStop.Checked;
+        }
+
+
+
+        /** ****************************************** */
+        /** *** All about parsing serial messages. *** */
+        /** ****************************************** */
+
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            /* Parse data when they arrive at input buffer. */
+
+            if (this.expectedDataType == DataType.MEASUREMENT)
+            {
+                this.ParseMeasurement();
+            }
+            else
+            {
+                this.ParseResolution();
+            }
+        }
+
+        private delegate void ParseCallback();
+
+        private void ParseMeasurement()
+        {
+            /** Parse a measurement result. */
+
+            string[] measurement;
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new ParseCallback(this.ParseMeasurement));
+            }
+            else
+            {
+                try
+                {
+                    measurement = this.comPort.ReadLine().Split(',');
+                    this.outputCounter = 0;
+                    foreach (string oneLine in measurement)
+                    {
+                        if (oneLine.Length > 0)
+                        {
+                            this.richTextBoxMeasurement.AppendText(oneLine.TrimEnd((char)13) + Environment.NewLine);
+                            this.richTextBoxMeasurement.SelectionStart = this.richTextBoxMeasurement.Text.Length;
+                            this.richTextBoxMeasurement.ScrollToCaret();
+                            this.outputCounter++;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Do nothing.
+                }
+
                 this.comPort.WriteLine("\x03"); // Stop unfinished job.
             }
         }
 
         private void ParseResolution()
         {
+            /** Parse a resulution result. */
+
             string resolution;
+            int emptyNumber;
 
             if (this.InvokeRequired)
             {
@@ -253,6 +488,14 @@ namespace Agilent
             }
             else
             {
+                /* Empty-string-padding until aligned with previous measurement in richTextBoxMeasurement. */
+                emptyNumber = this.richTextBoxMeasurement.Lines.Length
+                    - this.richTextBoxResolution.Lines.Length - this.outputCounter;
+                for (int i = 0; i < emptyNumber; i++)
+                {
+                    this.richTextBoxResolution.AppendText(Environment.NewLine);
+                }
+
                 try
                 {
                     resolution = this.comPort.ReadLine();
@@ -263,91 +506,70 @@ namespace Agilent
                 }
                 catch
                 {
-                    Console.WriteLine("Resolution error: timeout!");
                     resolution = "N/A" + Environment.NewLine;
                 }
-                for (int i = 0; i < this.readoutCounter; i++)
+                for (int i = 0; i < this.outputCounter; i++)
                 {
                     this.richTextBoxResolution.AppendText(resolution);
+                    this.richTextBoxResolution.SelectionStart = this.richTextBoxResolution.Text.Length;
+                    this.richTextBoxResolution.ScrollToCaret();
                 }
                 this.ifDataReceived = true;
             }
         }
+        
 
-        private void buttonRunSeqOnce_Click(object sender, EventArgs e)
+
+        /** ************************** */
+        /** *** All about display. *** */
+        /** ************************** */
+
+        private delegate void ColorDisplayCommandCallback(int index);
+
+        private void ColorDisplayCurrentSetup(int index)
         {
-            this.sequence.UpdateSequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription);
-            this.expectedDataType = DataType.READOUT;
-            this.ifAbortImmediately = false;
-            this.checkBoxStop.Checked = true;
-            this.buttonConnect.Enabled = false;
-            Thread threadRunSeq = new Thread(new ThreadStart(this.RunSequence));
-            threadRunSeq.Start();
+            this.sequence.DisplaySetup(this.richTextBoxSetup, this.richTextBoxSetupDelay, index);
         }
 
-        private delegate void ColorDisplayCurrentCommandCallback(int index);
-
-        private void ColorDisplayCurrentCommand(int index)
+        private void ColorDisplayCurrentLoop(int index)
         {
-            this.sequence.DisplaySequence(this.richTextBoxSeup, this.richTextBoxSetupDelay, this.richTextBoxDescription, index);
+            this.sequence.DisplayLoop(this.richTextBoxLoop, this.richTextBoxLoopDelay, index);
         }
 
-        private delegate void ChangeDisplayStatusCallback();
 
-        private void ChangeDisplayStatusToRun()
-        {
-            this.ifAbort = this.checkBoxStop.Checked;
-            this.labelRunStatus.Text = "Status: Running";
-            this.buttonRunSequence.Enabled = false;
-            this.buttonRunSequenceOnce.Enabled = false;
-            this.buttonConnect.Enabled = false;
-        }
-
-        private void ChangeDisplayStatusToIdle()
-        {
-            this.checkBoxStop.Checked = false;
-            this.labelRunStatus.Text = "Status: Idle";
-            this.buttonRunSequence.Enabled = true;
-            this.buttonRunSequenceOnce.Enabled = true;
-            this.buttonConnect.Enabled = true;
-        }
-
-        private void checkBoxStop_CheckedChanged(object sender, EventArgs e)
-        {
-            this.ifAbort = this.checkBoxStop.Checked;
-        }
+        
+        /** *************************** */
+        /** *** All about readouts. *** */
+        /** *************************** */
 
         private void buttonClearReadout_Click(object sender, EventArgs e)
         {
-            this.richTextBoxReadout.Clear();
+            /* Clear displayed readout. */
+
+            this.richTextBoxMeasurement.Clear();
             this.richTextBoxResolution.Clear();
             this.splitContainerReadout.Update();
         }
 
-        private void buttonClearSequence_Click(object sender, EventArgs e)
-        {
-            this.richTextBoxSeup.Clear();
-            this.richTextBoxSetupDelay.Clear();
-            this.richTextBoxDescription.Clear();
-        }
-
         private void buttonSaveReadout_Click(object sender, EventArgs e)
         {
+            /** Save displayed readouts to a .csv file. */
+
             Stream stream = null;
             StreamWriter writer = null;
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
 
-            saveFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"readouts";
-            saveFileDialog1.Filter = "csv files(*.csv)|*.csv|All files (*.*)|*.*";
-            saveFileDialog1.FilterIndex = 1;
-            saveFileDialog1.RestoreDirectory = true;
-            saveFileDialog1.FileName = this.sequence.FileName;
+            saveFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"readouts";
+            saveFileDialog.Filter = "csv files(*.csv)|*.csv|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = this.sequence.FileName;
 
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if ((stream = saveFileDialog1.OpenFile()) != null)
+                    if ((stream = saveFileDialog.OpenFile()) != null)
                     {
                         using (writer = new StreamWriter(stream))
                         {
@@ -355,18 +577,20 @@ namespace Agilent
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                    // Do nothing.
                 }
             }
         }
 
         private void WriteReadoutToFile(StreamWriter writer)
         {
-            string[] readout = this.richTextBoxReadout.Text.Split('\n');
+            /** Write readout to file. */
+
+            string[] measurement = this.richTextBoxMeasurement.Text.Split('\n');
             string[] resolution = this.richTextBoxResolution.Text.Split('\n');
-            int length = Math.Min(readout.Length, resolution.Length);
+            int length = Math.Min(measurement.Length, resolution.Length);
 
             writer.WriteLine("Sequence file name," + this.sequence.FileName);
             writer.WriteLine("Sequence file path," + this.sequence.FilePath);
@@ -375,7 +599,7 @@ namespace Agilent
             writer.WriteLine("Readout,Resolution");
             for (int i = 0; i < length; i++)
             {
-                writer.Write(readout[i]);
+                writer.Write(measurement[i]);
                 writer.Write(",");
                 writer.WriteLine(resolution[i]);
             }
@@ -384,25 +608,27 @@ namespace Agilent
 
         private void buttonPlotReadout_Click(object sender, EventArgs e)
         {
+            /** Plot measurements. */
+
             int counter = 1;
-            string[] readout;
+            string[] measurement;
 
             this.chartReadoutPlot.Series.Clear();
-            this.chartReadoutPlot.Series.Add("Readout");
-            this.chartReadoutPlot.Series["Readout"].ChartType = SeriesChartType.Line;
-            if (richTextBoxReadout.SelectedText.Length > 0)
+            this.chartReadoutPlot.Series.Add("Measurement");
+            this.chartReadoutPlot.Series["Measurement"].ChartType = SeriesChartType.Line;
+            if (richTextBoxMeasurement.SelectedText.Length > 0)
             {
-                readout = richTextBoxReadout.SelectedText.Split('\n');
+                measurement = richTextBoxMeasurement.SelectedText.Split('\n');
             }
             else
             {
-                readout = richTextBoxReadout.Text.Split('\n');
+                measurement = richTextBoxMeasurement.Text.Split('\n');
             }
-            foreach (string oneLine in readout)
+            foreach (string oneLine in measurement)
             {
                 try
                 { 
-                    this.chartReadoutPlot.Series["Readout"].Points.AddXY(counter, double.Parse(oneLine));
+                    this.chartReadoutPlot.Series["Measurement"].Points.AddXY(counter, double.Parse(oneLine));
                     counter++;
                 }
                 catch
@@ -411,68 +637,6 @@ namespace Agilent
                 }
             }
             this.chartReadoutPlot.Update();
-        }
-
-        private void buttonStopSequence_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Console.WriteLine("Send stop message");
-                this.comPort.WriteLine("\x03");
-                this.ifAbort = true;
-                this.ifDataReceived = true;
-            }
-            catch
-            {
-                // Do nothing.
-            }
-        }
-
-        private void buttonSaveSequence_Click(object sender, EventArgs e)
-        {
-            Stream stream = null;
-            StreamWriter writer = null;
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-            saveFileDialog1.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + @"sequences";
-            saveFileDialog1.Filter = "txt files(*.txt)|*.txt|All files (*.*)|*.*";
-            saveFileDialog1.FilterIndex = 1;
-            saveFileDialog1.RestoreDirectory = true;
-            saveFileDialog1.FileName = this.sequence.FileName;
-
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    if ((stream = saveFileDialog1.OpenFile()) != null)
-                    {
-                        using (writer = new StreamWriter(stream))
-                        {
-                            WriteSequenceToFile(writer);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-            }
-        }
-
-        private void WriteSequenceToFile(StreamWriter writer)
-        {
-            this.sequence.UpdateSequence(richTextBoxSeup, richTextBoxSetupDelay, richTextBoxDescription);
-            writer.WriteLine("Sequence:");
-            for (int i = 0; i < this.sequence.Length; i++)
-            {
-                writer.Write(this.sequence.getCommand(i).Scpi);
-                writer.Write(" #");
-                writer.WriteLine(this.sequence.getCommand(i).Delay);
-                Console.WriteLine(this.sequence.getCommand(i).Delay);
-            }
-            writer.Write(Environment.NewLine);
-            writer.WriteLine("Description:");
-            writer.WriteLine(this.sequence.ToString());
         }
     }
 }

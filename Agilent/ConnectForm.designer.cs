@@ -1,6 +1,6 @@
 ﻿namespace Agilent
 {
-    partial class Form2
+    partial class ConnectForm
     {
         /// <summary>
         /// Required designer variable.
@@ -154,7 +154,7 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // Form2
+            // ConnectForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -171,9 +171,9 @@
             this.Controls.Add(this.tbxDataBits);
             this.Controls.Add(this.tbxBaudRate);
             this.Controls.Add(this.tbxPortName);
-            this.Name = "Form2";
+            this.Name = "ConnectForm";
             this.Text = "Connection Setup";
-            this.Load += new System.EventHandler(this.Form2_Load);
+            this.Load += new System.EventHandler(this.ConnectForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

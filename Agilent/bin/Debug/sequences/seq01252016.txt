@@ -1,7 +1,0 @@
-Sequence:
-*CLS #10
-SYST:REM #10
-READ? #10
-
-Description:
-One measurements of DC voltage after external trigger.

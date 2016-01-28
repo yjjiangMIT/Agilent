@@ -22,6 +22,6 @@ C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\bin\Debug\A
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\bin\Debug\Agilent.pdb
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.csprojResolveAssemblyReference.cache
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.Form1.resources
-C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.Form2.resources
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.Properties.Resources.resources
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.csproj.GenerateResource.Cache
+C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.ConnectForm.resources
