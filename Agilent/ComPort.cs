@@ -14,6 +14,7 @@ namespace Agilent
             this.BaudRate = baudRate;
             this.DataBits = dataBits;
             this.DtrEnable = true;
+            this.ReadTimeout = 500;
 
             switch (stopBits)
             {

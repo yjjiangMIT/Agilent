@@ -2,10 +2,12 @@ Description:
 One measurements of DC voltage after external trigger.
 
 Setup:
-FUNC "VOLT:DC" #20
-SAMP:COUN 1 #20
-TRIG:SOUR EXT #20
+*CLS #10
+SYST:REM #10
+FUNC "VOLT:DC" #10
+SAMP:COUN 1 #10
+TRIG:SOUR EXT #10
 
 Loop:
-READ? #20
-VOLT:RES? #20
+READ? #10
+VOLT:RES? #10

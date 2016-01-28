@@ -90,8 +90,10 @@ namespace Agilent
             string line;
             string[] splitLine;
 
+            this.setup.Clear();
+            this.loop.Clear();
+
             /* Load discription. */
-           
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("Description:"))
@@ -104,7 +106,6 @@ namespace Agilent
                 if (line.Length > 0)
                 {
                     this.description = line;
-                    Console.WriteLine(this.description);
                     break;
                 }
             }
@@ -114,7 +115,6 @@ namespace Agilent
             {
                 if (line.StartsWith("Setup:"))
                 {
-                    Console.WriteLine(line);
                     break;
                 }
             }
@@ -130,7 +130,6 @@ namespace Agilent
                     {
                         if (line.Length > 0)
                         {
-                            Console.WriteLine(line + "ddd");
                             splitLine = line.Split('#');
                             this.setup.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
                         }
@@ -143,7 +142,6 @@ namespace Agilent
             {
                 if (line.Length > 0)
                 {
-                    Console.WriteLine(line + "ddd");
                     splitLine = line.Split('#');
                     this.loop.Add(new Command(splitLine[0].TrimEnd(' '), int.Parse(splitLine[1])));
                 }

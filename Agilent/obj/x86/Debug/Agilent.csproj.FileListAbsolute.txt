@@ -25,3 +25,19 @@ C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Deb
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.Properties.Resources.resources
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.csproj.GenerateResource.Cache
 C:\Users\Yijun\Documents\Visual Studio 2015\Projects\Agilent\Agilent\obj\x86\Debug\Agilent.ConnectForm.resources
+C:\Users\bec3\Desktop\Agilent\Agilent\obj\x86\Debug\Agilent.exe
+C:\Users\bec3\Desktop\Agilent\Agilent\obj\x86\Debug\Agilent.pdb
+C:\Users\bec3\Desktop\Agilent\Agilent\bin\Debug\Agilent.exe
+C:\Users\bec3\Desktop\Agilent\Agilent\bin\Debug\Agilent.pdb
+C:\Users\bec3\Desktop\Agilent\Agilent\obj\x86\Debug\Agilent.MainForm.resources
+C:\Users\bec3\Desktop\Agilent\Agilent\obj\x86\Debug\Agilent.ConnectForm.resources
+C:\Users\bec3\Desktop\Agilent\Agilent\obj\x86\Debug\Agilent.Properties.Resources.resources
+C:\Users\bec3\Desktop\Agilent\Agilent\obj\x86\Debug\Agilent.csproj.GenerateResource.Cache
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\obj\x86\Debug\Agilent.exe
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\obj\x86\Debug\Agilent.pdb
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\bin\Debug\Agilent.exe
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\bin\Debug\Agilent.pdb
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\obj\x86\Debug\Agilent.MainForm.resources
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\obj\x86\Debug\Agilent.ConnectForm.resources
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\obj\x86\Debug\Agilent.Properties.Resources.resources
+C:\Users\bec3\Documents\Visual Studio 2010\Projects\AgilentDMM\Agilent\obj\x86\Debug\Agilent.csproj.GenerateResource.Cache

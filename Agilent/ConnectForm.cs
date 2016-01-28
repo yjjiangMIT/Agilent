@@ -5,10 +5,10 @@ namespace Agilent
 {
     public partial class ConnectForm : Form
     {
-        public ConnectForm(Form1 form1)
+        public ConnectForm(MainForm mainForm)
         {
             InitializeComponent();
-            this.fatherForm = form1;
+            this.fatherForm = mainForm;
         }
 
         private void ConnectForm_Load(object sender, EventArgs e)

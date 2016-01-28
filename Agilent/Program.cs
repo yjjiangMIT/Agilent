@@ -8,7 +8,7 @@ namespace Agilent
 {
     static class Program
     {
-        public static Form1 form1;
+        public static MainForm mainForm;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -17,8 +17,8 @@ namespace Agilent
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            form1 = new Form1();
-            Application.Run(form1);
+            mainForm = new MainForm();
+            Application.Run(mainForm);
         }
     }
 }
